@@ -29,8 +29,8 @@ describe('Position', () => {
         subsearch: true
       });
       expect(test.center).to.deep.equal([
-        1.0003032629391886,
-        2.000170873643946
+        0.9999063853985626,
+        2.001119760004479
       ]);
     });
     it('finds median of points', () => {

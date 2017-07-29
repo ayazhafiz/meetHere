@@ -39,7 +39,7 @@ describe('MeetHere', () => {
         ],
         process.env.GOOGLE_MAPS_TOKEN
       );
-      test.meetHere.should.deep.equal([33.0437139990918, -96.81574642549619]);
+      test.meetHere.should.deep.equal([33.04373236065685, -96.81583367822624]);
     });
     it('gives nearby roads', () => {
       const test = new MeetHere(
