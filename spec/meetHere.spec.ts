@@ -26,18 +26,7 @@ describe('MeetHere', () => {
           [33.0284505, -96.7546927]
         ]);
       expect(test).to.have.property('client').that.is.an('Object');
-      expect(test).to.have
-        .property('subsearch')
-        .that.is.an('boolean')
-        .that.deep.equals(false);
-      expect(test).to.have
-        .property('epsilon')
-        .that.is.an('number')
-        .that.deep.equals(1e-6);
-      expect(test).to.have
-        .property('bounds')
-        .that.is.an('number')
-        .that.deep.equals(10);
+      expect(test).to.have.property('options').that.has.property('epsilon');
     });
   });
   describe('functionality', () => {
@@ -50,7 +39,7 @@ describe('MeetHere', () => {
         ],
         process.env.GOOGLE_MAPS_TOKEN
       );
-      test.meetHere.should.deep.equal([33.04371181611578, -96.81579457575877]);
+      test.meetHere.should.deep.equal([33.0437139990918, -96.81574642549619]);
     });
     it('gives nearby roads', () => {
       const test = new MeetHere(

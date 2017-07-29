@@ -1,8 +1,9 @@
-# meetHere <img src="https://cdn.rawgit.com/ayazhafiz/meetHere/master/meetHere.svg" height=175 align="right"/>
+# meetHere <img src="https://cdn.rawgit.com/ayazhafiz/meetHere/master/meetHere.svg" height=220 align="right"/>
 > A hyper-efficient library for position manipulation.
 
 [![Build Status](https://travis-ci.org/ayazhafiz/meetHere.svg?branch=master)](https://travis-ci.org/ayazhafiz/meetHere)
 [![Coverage Status](https://coveralls.io/repos/github/ayazhafiz/meetHere/badge.svg?branch=master)](https://coveralls.io/github/ayazhafiz/meetHere?branch=master)
+[![GitHub](https://img.shields.io/badge/View%20On-GitHub-blue.svg)](https://github.com/ayazhafiz/meetHere)
 
 meetHere is a library for quick, elegant manipulation of positional data on a 2D
 plane, and comes with first-class Google Maps support for on-the-fly
@@ -26,12 +27,12 @@ $ npm i meethere --save
 ```
 
 ## Usage
-You can find the full API [here](http://meethere.ayazhafiz.com)
+You can find the full API [here](http://meethere.ayazhafiz.com).
 
 Currently, two classes are available:
 
-#### `Position` - a blazing-fast, 2D-locations manipulations prototype.
-> For general purpose apps, like physics libraries or games.
+#### `Position` - a blazing-fast, 2D-locations manipulation prototype.
+> For general-purpose use, like in physics libraries or games.
 
 ```javascript
 import { Position } from 'meethere';
@@ -53,13 +54,14 @@ described
 ```javascript
 import { MeetHere } from 'meethere';
 
+const MY_GOOGLE_MAPS_TOKEN = process.env.TOKEN;
 const user = [33.0952311, -96.8640427];
 const west = [33.0437115, -96.8157956];
 const senior = [33.0284505, -96.7546927];
 
 let Map = new MeetHere(
   [user, west, senior],
-  'MY_GOOGLE_MAPS_TOKEN'
+  MY_GOOGLE_MAPS_TOKEN
 );
 Map.meetHere // => [ 33.04371181611578, -96.81579457575877 ]
 Map.nearby().then(console.log) // => { results: [...] }

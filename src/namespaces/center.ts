@@ -15,19 +15,16 @@ export namespace Center {
    *    (-s2,-s2)   (s2,-s2)
    *          (0,-1)
    */
-  const s2 = -Math.sqrt(2) / 2;
+  const s2 = Math.sqrt(2) / 2;
   const delta = {
     x: [-1, -s2, 0, s2, 1, s2, 0, -s2],
     y: [0, s2, 1, s2, 0, -s2, -1, -s2]
   };
 
-  function compoundPythagoreanDistance(
-    points: Array<Array<number>>,
-    ...args: Array<number>
-  );
+  function cost(points: Array<Array<number>>, ...args: Array<number>);
   /**
-   * Summates the Pythagorean distance between a center and an arbitrary amount of
-   * points.
+   * Summates the Pythagorean distance between a center and an arbitrary amount
+   * of points as an efficient and powerful cost function.
    *
    * @function
    * @param {Array} points 2D Array of points on a plane
@@ -35,11 +32,7 @@ export namespace Center {
    * @param {number} y y coordinate of center
    * @return {number} Sum of Pythagorean distances from center to each point
    */
-  function compoundPythagoreanDistance(
-    points: Array<Array<number>>,
-    x: number,
-    y: number
-  ): number {
+  function cost(points: Array<Array<number>>, x: number, y: number): number {
     return points.reduce(
       (sum, value) =>
         sum + Math.sqrt((value[0] - x) ** 2 + (value[1] - y) ** 2),
@@ -63,15 +56,20 @@ export namespace Center {
       points.reduce((sum, value) => sum + value[0], 0) / points.length,
       points.reduce((sum, value) => sum + value[1], 0) / points.length
     ];
-    return {
-      center: center,
-      score: compoundPythagoreanDistance(points, ...center)
-    };
+    return { center: center, score: cost(points, ...center) };
   }
 
-  export function geometric(...args);
+  export function geometric(
+    points: Array<Array<number>>,
+    ...args: Array<number | boolean>
+  );
   /**
    * Calculates the geometric center of an arbitrary amount of points.
+   *
+   * This is done through a simple Newtonian search; i.e. we iterate an
+   * indiscriminate amount of times through smaller bounds until we approve some
+   * margin of error (epsilon). Note that local maxima is a non-issue, as the
+   * geometric median is (unique and covergent for non-co-linear points)[http://www.stat.rutgers.edu/home/cunhui/papers/39.pdf].
    *
    * @name Center#geometric
    * @function
@@ -83,9 +81,9 @@ export namespace Center {
    */
   export function geometric(
     points: Array<Array<number>>,
-    subsearch: boolean = false,
-    epsilon: number = 1e-3,
-    bounds: number = 10
+    subsearch: boolean,
+    epsilon: number,
+    bounds: number
   ): { center: Array<number>; score: number } {
     // Initially, our center is the median and our score is that of the median.
     const com = mass(points);
@@ -100,7 +98,7 @@ export namespace Center {
       for (let i = 0; i < delta.x.length; subsearch ? ++i : (i += 2)) {
         const _nx = center[0] + step * delta.x[i];
         const _ny = center[1] + step * delta.y[i];
-        const _nScore = compoundPythagoreanDistance(points, _nx, _ny);
+        const _nScore = cost(points, _nx, _ny);
 
         // If the algorithm has improved our score, we apply it...
         if (_nScore < score) {
@@ -115,9 +113,21 @@ export namespace Center {
         step /= 2;
       }
     }
-    return {
-      center: center,
-      score: score
-    };
+    return { center: center, score: score };
+  }
+
+  export function anneal(points: Array<Array<number>>) {
+    const com = mass(points);
+    let [center, score] = [com.center, com.score];
+
+    let temp = 1.0;
+    const min = 1e-5;
+    const alpha = 0.9;
+
+    while (temp > min) {
+      temp *= alpha;
+    }
+
+    return { center: center, score: score };
   }
 }

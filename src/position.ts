@@ -1,34 +1,59 @@
-import { Center } from './center';
+import { Center } from './namespaces/center';
+import { CenterOptions } from './interfaces/index';
 
 /**
- * Describes a set of points on a plane.
+ * A prototype describing a set of points on a plane.
+ *
+ * ```
+ * import { Position } from 'meethere';
+ *
+ * const options = {
+ *   subsearch: true,
+ *   epsilon: 1e-4,
+ *   bounds: 15
+ * }
+ *
+ * let Plane = new Position(
+ *   [ [5, 6.1], [-2.07, -1.33], [9.8, -0.02] ],
+ *   options
+ * );
+ * Plane.add([1, -4]);
+ * Plane.center // => [ 2.2460648128951566, -0.853617418121833 ]
+ * Plane.score // => 0.010113270070291593
+ * ```
+ *
  * @class
  */
 export class Position {
   locations: Array<Array<number>>;
-  subsearch: boolean;
-  epsilon: number;
-  bounds: number;
+  options: CenterOptions;
 
   /**
-   * Creates a Position on a plane described by a set of points.
+   * Default geometric center options
+   *
+   * @constant
+   * @type {SearchOptions}
+   * @default
+   */
+  static defaultCenterOptions: CenterOptions = {
+    subsearch: false,
+    epsilon: 1e-3,
+    bounds: 10
+  };
+
+  /**
+   * Creates a Position on a plane described by a set of locations.
    *
    * @constructs
    * @param {Array} locations 2D Array of points on a plane
-   * @param {boolean} [subsearch=false] Whether to search for centroid obliquely
-   * @param {number} [epsilon=1e-3] Precision for centroid calculations
-   * @param {number} [bounds=10] Starting unit bounds for centroid calculations
+   * @param {CenterOptions} [options=Position.defaultCenterOptions] Geometric center search options
    */
   constructor(
     locations: Array<Array<number>>,
-    subsearch: boolean = false,
-    epsilon: number = 1e-3,
-    bounds: number = 10
+    options: CenterOptions = Position.defaultCenterOptions
   ) {
     this.locations = locations;
-    this.subsearch = subsearch;
-    this.epsilon = epsilon;
-    this.bounds = bounds;
+    this.options = { ...Position.defaultCenterOptions, ...options };
   }
 
   /**
@@ -72,7 +97,7 @@ export class Position {
    * @return {Array} Geometric center of the Position
    */
   get center(): Array<number> {
-    return Center.geometric(...this.values).center;
+    return Center.geometric(this.locations, ...this.optionValues).center;
   }
 
   /**
@@ -99,7 +124,7 @@ export class Position {
   get score(): number {
     const [median, center] = [
       Center.mass(this.locations).score,
-      Center.geometric(...this.values).score
+      Center.geometric(this.locations, ...this.optionValues).score
     ];
     return (median - center) / median;
   }
@@ -111,7 +136,7 @@ export class Position {
    * @private
    * @return {Array} Values of each key of the Position
    */
-  private get values(): Array<Array<number> | number | boolean> {
-    return Object.getOwnPropertyNames(this).map(v => this[v]);
+  private get optionValues(): Array<number | boolean> {
+    return Object.getOwnPropertyNames(this.options).map(v => this.options[v]);
   }
 }

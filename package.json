@@ -6,7 +6,7 @@
   "scripts": {
     "bench": "./node_modules/.bin/ts-node ./benchmark/bench.ts",
     "build": "./node_modules/.bin/tsc",
-    "docs": "npm run build && jsdoc -c jsdoc-conf.json --verbose",
+    "docs": "npm run build && jsdoc -c .jsdoc.json --verbose",
     "prepare": "npm run build",
     "posttest": "./node_modules/.bin/nyc report --reporter=text-lcov | coveralls",
     "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha ./spec/*.spec.ts -t 5000"
@@ -29,6 +29,8 @@
     "@types/chai-as-promised": "^0.0.31",
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.17",
+    "benchmark": "^2.1.4",
+    "bindings": "^1.3.0",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^2.13.1",

@@ -1,53 +1,36 @@
 import { Position } from './position';
 import { createClient } from '@google/maps';
+import {
+  GoogleMapsClient,
+  PlacesOptions,
+  CenterOptions
+} from './interfaces/index';
 
 /**
- * Describes a Google Maps client
+ * A prototype describing a set of points on a map, with first-class Google Maps
+ * integration. Non-trivial tasks require the declaration of an API token.
  *
- * @interface
- */
-interface GoogleMapsClient {
-  directions: Function;
-  distanceMatrix: Function;
-  elevation: Function;
-  elevationAlongPath: Function;
-  geocode: Function;
-  geolocate: Function;
-  reverseGeocode: Function;
-  places: Function;
-  placesNearby: Function;
-  placesRadar: Function;
-  place: Function;
-  placesPhoto: Function;
-  placesAutoComplete: Function;
-  placesQueryAutoComplete: Function;
-  snapToRoads: Function;
-  nearestRoads: Function;
-  speedLimits: Function;
-  snappedSpeedLimits: Function;
-  timezone: Function;
-}
-
-/**
- * Describes MeetHere#nearby options
+ * ```
+ * import { MeetHere } from 'meethere';
  *
- * @interface
- */
-interface PlacesOptions {
-  language?: string;
-  radius?: number;
-  keyword?: string;
-  minprice?: number;
-  maxprice?: number;
-  name?: string;
-  opennow?: boolean;
-  rankby?: string;
-  type?: string;
-  pagetoken?: string;
-}
-
-/**
- * Describes a set of points on a map.
+ * let Map = new MeetHere(
+ *   [ [-33, 44], [-35, 41], [-31, 43] ],
+ *   MY_GOOGLE_MAPS_TOKEN
+ * );
+ * ```
+ *
+ * In general, calls to Google-esque services will return an asynchronous
+ * `Promise` from which the response can be handled.
+ *
+ * ```
+ * Map.nearby() // => Promise<pending>
+ * Map.nearby(options, true).then(processNearbyLocations)
+ *
+ * function processNearbyLocations(error, result) {
+ *   ...
+ * }
+ * ```
+ *
  * @class
  * @extends Position
  */
@@ -58,37 +41,48 @@ export class MeetHere extends Position {
    * Default nearby search options
    *
    * @constant
+   * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#placesNearby
    * @type {object}
    * @default
    */
-  static defaultSearchOptions = {
+  static defaultPlacesOptions: PlacesOptions = {
     language: 'English',
     rankby: 'distance'
   };
 
   /**
-   * Creates a MeetHere on a map described by a set of points.
+   * Default geometric center options
    *
+   * @constant
+   * @type {SearchOptions}
+   * @default
+   */
+  static defaultCenterOptions: CenterOptions = {
+    subsearch: true,
+    epsilon: 1e-4,
+    bounds: 10
+  };
+
+  /**
+   * Creates a MeetHere on a map described by a set of locations.
+   *
+   * @see https://github.com/googlemaps/google-maps-services-js/tree/master#api-keys
    * @constructs
    * @param {Array} locations 2D Array of points on a map
    * @param {string} token Google Maps API token
-   * @param {boolean} [subsearch=false] Whether to search for centroid obliquely
-   * @param {number} [epsilon=1e-6] Precision for centroid calculations
-   * @param {number} [bounds=10] Starting unit bounds for centroid calculations
+   * @param {CenterOptions} [options=MeetHere.defaultCenterOptions] Whether to search for centroid obliquely
    */
   constructor(
     locations: Array<Array<number>>,
     token: string,
-    subsearch: boolean = false,
-    epsilon: number = 1e-6,
-    bounds: number = 10
+    options: CenterOptions = MeetHere.defaultCenterOptions
   ) {
-    super(locations, subsearch, epsilon, bounds);
+    super(locations, options);
     this.client = createClient({ key: token, Promise: Promise });
   }
 
   /**
-   * Calculates the geometric center of the Position.
+   * Same as MeetHere#center.
    *
    * @name MeetHere#meetHere
    * @alias Position#center
@@ -122,13 +116,13 @@ export class MeetHere extends Position {
    * @name MeetHere#nearby
    * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#placesNearby
    * @function
-   * @param {PlacesOptions} [options=defaultSearchOptions] Options to apply to search
-   * request, can be any of @see
+   * @param {PlacesOptions} [options=defaultSearchOptions] Options to apply to
+   * search request, can be any of @see
    * @param {boolean} [geometric=true] Whether to use geometric/median center
    * @return {Promise} A Promise that will yield nearby places or an error
    */
   nearby(
-    options: PlacesOptions = MeetHere.defaultSearchOptions,
+    options: PlacesOptions = MeetHere.defaultPlacesOptions,
     geometric: boolean = true
   ): Promise<object> {
     options['location'] = this.middle(geometric);
