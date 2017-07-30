@@ -38,8 +38,6 @@ std::vector<double> centerOfMass(const v8::Local<v8::Array> &points) {
 }
 
 void geometric(const v8::FunctionCallbackInfo<v8::Value> &args) {
-  // storing String
-  // v8::Local<v8::String> str = args[0] -> ToString();
   v8::Isolate *isolate = args.GetIsolate();
   v8::Local<v8::Array> points = v8::Local<v8::Array>::Cast(args[0]);
   bool subsearch = args[1]->BooleanValue();

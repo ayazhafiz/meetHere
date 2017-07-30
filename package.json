@@ -41,9 +41,16 @@
     "typescript": "^2.4.2"
   },
   "nyc": {
-    "extension": [".ts"],
-    "exclude": ["spec/**/*.ts", "src/index.ts"],
-    "require": ["ts-node/register"],
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "spec/**/*.ts",
+      "src/index.ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "cache": false
   }
 }

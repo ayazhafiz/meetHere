@@ -1,3 +1,4 @@
+import * as Bindings from 'bindings';
 import { Center } from './namespaces/center';
 import { CenterOptions } from './interfaces/index';
 
@@ -98,6 +99,19 @@ export class Position {
    */
   get center(): Array<number> {
     return Center.geometric(this.locations, ...this.optionValues).center;
+  }
+
+  /**
+   * Calculates the geometric center of the Position.
+   *
+   * @name Position#center
+   * @see Center#geometric
+   * @function
+   * @return {Array} Geometric center of the Position
+   */
+  get nativeCenter(): Array<number> {
+    return Bindings('center').geometric(this.locations, ...this.optionValues)
+      .center;
   }
 
   /**

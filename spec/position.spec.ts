@@ -33,6 +33,13 @@ describe('Position', () => {
         2.001119760004479
       ]);
     });
+    it('finds geometric center with C++ bindings', () => {
+      const test = new Position([[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]]);
+      expect(test.nativeCenter).to.deep.equal([
+        1.254766251050433,
+        3.0485580098350864
+      ]);
+    });
     it('finds median of points', () => {
       const test = new Position([[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]]);
       expect(test.median).to.deep.equal([0.525, 3.75]);

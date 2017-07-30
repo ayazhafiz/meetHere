@@ -115,19 +115,4 @@ export namespace Center {
     }
     return { center: center, score: score };
   }
-
-  export function anneal(points: Array<Array<number>>) {
-    const com = mass(points);
-    let [center, score] = [com.center, com.score];
-
-    let temp = 1.0;
-    const min = 1e-5;
-    const alpha = 0.9;
-
-    while (temp > min) {
-      temp *= alpha;
-    }
-
-    return { center: center, score: score };
-  }
 }

@@ -61,6 +61,18 @@
     "want_separate_host_toolset_mkpeephole": 0,
     "xcode_version": "7.0",
     "nodedir": "/Users/hafiz/.node-gyp/7.10.1",
-    "standalone_static_library": 1
+    "standalone_static_library": 1,
+    "version_git_tag": "true",
+    "init_license": "MIT",
+    "registry": "https://registry.yarnpkg.com",
+    "save_prefix": "^",
+    "strict_ssl": "true",
+    "version_git_message": "v%s",
+    "version_git_sign": "",
+    "ignore_scripts": "",
+    "user_agent": "yarn/0.27.5 npm/? node/v7.10.1 darwin x64",
+    "init_version": "1.0.0",
+    "ignore_optional": "",
+    "version_tag_prefix": "v"
   }
 }
