@@ -2,8 +2,10 @@ import { Position } from './position';
 import { createClient } from '@google/maps';
 import {
   GoogleMapsClient,
+  CenterOptions,
+  DistanceOptions,
   PlacesOptions,
-  CenterOptions
+  TimeZoneOptions
 } from './interfaces/index';
 
 /**
@@ -38,11 +40,33 @@ export class MeetHere extends Position {
   client: GoogleMapsClient;
 
   /**
+   * Default geometric center options
+   *
+   * @constant
+   * @type {CenterOptions}
+   * @default
+   */
+  static defaultCenterOptions: CenterOptions = {
+    subsearch: true,
+    epsilon: 1e-4,
+    bounds: 10
+  };
+
+  /**
+   * Default distance matrix options
+   *
+   * @constant
+   * @type {DistanceOptions}
+   * @default
+   */
+  static defaultDistanceOptions: DistanceOptions = {};
+
+  /**
    * Default nearby search options
    *
    * @constant
    * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#placesNearby
-   * @type {object}
+   * @type {PlacesOptions}
    * @default
    */
   static defaultPlacesOptions: PlacesOptions = {
@@ -51,16 +75,15 @@ export class MeetHere extends Position {
   };
 
   /**
-   * Default geometric center options
+   * Default timezone search options
    *
    * @constant
-   * @type {SearchOptions}
+   * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#timezone
+   * @type {TimeZoneOptions}
    * @default
    */
-  static defaultCenterOptions: CenterOptions = {
-    subsearch: true,
-    epsilon: 1e-4,
-    bounds: 10
+  static defaultTimeZoneOptions: TimeZoneOptions = {
+    timestamp: null
   };
 
   /**
@@ -82,6 +105,18 @@ export class MeetHere extends Position {
   }
 
   /**
+   * Returns the center of the MeetHere based on the geometric parameter.
+   *
+   * @function
+   * @private
+   * @param {boolean} geometric Whether to use geometric/median center
+   * @return {Array} The center of the MeetHere
+   */
+  private middle(geometric: boolean): Array<number> {
+    return geometric ? super.center : super.median;
+  }
+
+  /**
    * Same as MeetHere#center.
    *
    * @name MeetHere#meetHere
@@ -94,11 +129,61 @@ export class MeetHere extends Position {
   }
 
   /**
+   * Returns a distance matrix from each location to the center of the MeetHere.
+   *
+   * @name MeetHere#distance
+   * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#distanceMatrix
+   * @function
+   * @param {DistanceOptions} [options=MeetHere.defaultDistanceOptions] Options
+   * to apply to distance matrix request, can be any of @see
+   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @return {Promise} A Promise that will yield the distance matrix or an error
+   */
+  distance(
+    options: DistanceOptions = {},
+    geometric: boolean = true
+  ): Promise<object> {
+    options['origins'] = this.locations;
+    options['destinations'] = [this.middle(geometric)];
+    return this.client
+      .distanceMatrix({
+        ...MeetHere.defaultDistanceOptions,
+        ...options
+      })
+      .asPromise()
+      .then(response => response.json)
+      .catch(error => error.json);
+  }
+
+  /**
+   * Returns places near the center of the MeetHere.
+   *
+   * @name MeetHere#nearby
+   * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#placesNearby
+   * @function
+   * @param {PlacesOptions} [options=MeetHere.defaultPlacesOptions] Options to
+   * apply to search request, can be any of @see
+   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @return {Promise} A Promise that will yield nearby places or an error
+   */
+  nearby(
+    options: PlacesOptions = {},
+    geometric: boolean = true
+  ): Promise<object> {
+    options['location'] = this.middle(geometric);
+    return this.client
+      .placesNearby({ ...MeetHere.defaultPlacesOptions, ...options })
+      .asPromise()
+      .then(response => response.json)
+      .catch(error => error.json);
+  }
+
+  /**
    * Returns roads near the center of the MeetHere.
    *
    * @name MeetHere#roads
    * @function
-   * @param {boolean} [geometric=true] Whether to use geometric/median center
+   * @param {boolean} [geometric=true] Whether to use geometric or median center
    * @return {Promise} A Promise that will yield nearby roads or an error
    */
   roads(geometric: boolean = true): Promise<object> {
@@ -111,37 +196,29 @@ export class MeetHere extends Position {
   }
 
   /**
-   * Returns places near the center of the MeetHere.
+   * Returns the time offset data of the center of the MeetHere at some moment.
    *
-   * @name MeetHere#nearby
-   * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#placesNearby
+   * @name MeetHere#timezone
+   * @see https://googlemaps.github.io/google-maps-services-js/docs/GoogleMapsClient.html#timezone
    * @function
-   * @param {PlacesOptions} [options=defaultSearchOptions] Options to apply to
-   * search request, can be any of @see
-   * @param {boolean} [geometric=true] Whether to use geometric/median center
-   * @return {Promise} A Promise that will yield nearby places or an error
+   * @param {TimeZoneOptions} [options=MeetHere.defaultTimeZoneOptions] Options
+   * to apply to timezone request, can be any of @see
+   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @return {Promise} A Promise that will yield time offset data or an error
    */
-  nearby(
-    options: PlacesOptions = MeetHere.defaultPlacesOptions,
+  timezone(
+    options: TimeZoneOptions = {},
     geometric: boolean = true
   ): Promise<object> {
     options['location'] = this.middle(geometric);
+    options = { ...MeetHere.defaultTimeZoneOptions, ...options };
+    options['timestamp'] = options['timestamp'] || ~~(Date.now() / 1000);
     return this.client
-      .placesNearby(options)
+      .timezone(options)
       .asPromise()
       .then(response => response.json)
       .catch(error => error.json);
   }
-
-  /**
-   * Returns the center of the MeetHere based on the geometric parameter.
-   *
-   * @function
-   * @private
-   * @param {boolean} geometric Whether to use geometric/median center
-   * @return {Array} The center of the MeetHere
-   */
-  private middle(geometric: boolean): Array<number> {
-    return geometric ? super.center : super.median;
-  }
 }
+1458000000;
+1501438730316;

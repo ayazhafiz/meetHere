@@ -31,6 +31,7 @@ describe('Position', () => {
       expect(test.center).to.deep.equal([
         0.9999063853985626,
         2.001119760004479
+<<<<<<< HEAD
       ]);
     });
     it('finds geometric center with C++ bindings', () => {
@@ -38,6 +39,8 @@ describe('Position', () => {
       expect(test.nativeCenter).to.deep.equal([
         1.254766251050433,
         3.0485580098350864
+=======
+>>>>>>> master
       ]);
     });
     it('finds median of points', () => {
@@ -55,7 +58,7 @@ describe('Position', () => {
       test.add([5, 3]);
       expect(test.locations).to.deep.equal([[1, 2], [5, 3]]);
     });
-    it('removes points from locations', () => {
+    it('removes points in locations', () => {
       const test = new Position([[1, 2], [5, 3]]);
       expect(test.remove([5, 3])).to.deep.equal([5, 3]);
       expect(test.locations).to.deep.equal([[1, 2]]);
@@ -63,6 +66,16 @@ describe('Position', () => {
     it('returns invalid index for removal of non-existent element', () => {
       const test = new Position([[1, 2]]);
       expect(test.remove([5, 3])).to.equal(-1);
+      expect(test.locations).to.deep.equal([[1, 2]]);
+    });
+    it('adjusts points in locations', () => {
+      const test = new Position([[1, 2], [5, 3]]);
+      expect(test.adjust([5, 3], [3, 5])).to.deep.equal([5, 3]);
+      expect(test.locations).to.deep.equal([[1, 2], [3, 5]]);
+    });
+    it('returns invalid index for adjustment of non-existent element', () => {
+      const test = new Position([[1, 2]]);
+      expect(test.adjust([5, 3], [3, 5])).to.equal(-1);
       expect(test.locations).to.deep.equal([[1, 2]]);
     });
   });

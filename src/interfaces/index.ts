@@ -26,7 +26,35 @@ export interface GoogleMapsClient {
 }
 
 /**
- * Describes MeetHere#nearby options
+ * Describes a CenterOptions Object
+ *
+ * @interface
+ */
+export interface CenterOptions {
+  subsearch?: boolean;
+  epsilon?: number;
+  bounds?: number;
+}
+
+/**
+ * Describes a DistanceOptions Object
+ *
+ * @interface
+ */
+export interface DistanceOptions {
+  mode?: string;
+  language?: string;
+  avoid?: Array<string>;
+  units?: string;
+  departure_time?: Date | number;
+  arrival_time?: Date | number;
+  transit_mode?: Array<string>;
+  transit_routing_preference?: string;
+  traffic_model?: string;
+}
+
+/**
+ * Describes a PlacesOptions Object
  *
  * @interface
  */
@@ -44,12 +72,11 @@ export interface PlacesOptions {
 }
 
 /**
- * Describes a SearchOptions Object
+ * Describes a TimeZoneOptions Object
  *
  * @interface
  */
-export interface CenterOptions {
-  subsearch?: boolean;
-  epsilon?: number;
-  bounds?: number;
+export interface TimeZoneOptions {
+  timestamp?: Date | number;
+  language?: string;
 }

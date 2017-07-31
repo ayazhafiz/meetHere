@@ -1,6 +1,9 @@
 import * as Bindings from 'bindings';
 import { Center } from './namespaces/center';
 import { CenterOptions } from './interfaces/index';
+import { arrayUtil } from './util/array';
+
+arrayUtil();
 
 /**
  * A prototype describing a set of points on a plane.
@@ -33,7 +36,7 @@ export class Position {
    * Default geometric center options
    *
    * @constant
-   * @type {SearchOptions}
+   * @type {CenterOptions}
    * @default
    */
   static defaultCenterOptions: CenterOptions = {
@@ -49,12 +52,20 @@ export class Position {
    * @param {Array} locations 2D Array of points on a plane
    * @param {CenterOptions} [options=Position.defaultCenterOptions] Geometric center search options
    */
-  constructor(
-    locations: Array<Array<number>>,
-    options: CenterOptions = Position.defaultCenterOptions
-  ) {
+  constructor(locations: Array<Array<number>>, options: CenterOptions = {}) {
     this.locations = locations;
     this.options = { ...Position.defaultCenterOptions, ...options };
+  }
+
+  /**
+   * Returns the values of each key of the current Position object
+   *
+   * @function
+   * @private
+   * @return {Array} Values of each key of the Position
+   */
+  private get optionValues(): Array<number | boolean> {
+    return Object.getOwnPropertyNames(this.options).map(v => this.options[v]);
   }
 
   /**
@@ -62,7 +73,7 @@ export class Position {
    *
    * @name Position#add
    * @function
-   * @param {Array} location 2D points on a plane
+   * @param {Array} location Point to add
    */
   add(location: Array<number>): void {
     this.locations.push(location);
@@ -73,20 +84,32 @@ export class Position {
    *
    * @name Position#remove
    * @function
-   * @param {Array} location 2D points on a plane
+   * @param {Array} location Point to remove
    * @return {Array|number} The removed location, or `-1` if no match is found
    */
   remove(location: Array<number>): Array<number> | number {
-    for (let i = 0; i < this.locations.length; i++) {
-      if (
-        this.locations[i][0] === location[0] &&
-        this.locations[i][1] === location[1]
-      ) {
-        this.locations.splice(i, 1);
-        return location;
-      }
+    const idx = this.locations.deepIndexOf(location);
+    if (idx > -1) {
+      return this.locations.splice(idx, 1)[0];
     }
-    return -1;
+    return idx;
+  }
+
+  /**
+   * Replaces an existing location.
+   *
+   * @name Position#adjust
+   * @function
+   * @param {Array} location Point to adjust
+   * @param {Array} to Value to adjust to
+   * @return {Array|number} The previous location, or `-1` if no match is found
+   */
+  adjust(location: Array<number>, to: Array<number>): Array<number> | number {
+    const idx = this.locations.deepIndexOf(location);
+    if (idx > -1) {
+      return this.locations.splice(idx, 1, to)[0];
+    }
+    return idx;
   }
 
   /**
@@ -99,19 +122,6 @@ export class Position {
    */
   get center(): Array<number> {
     return Center.geometric(this.locations, ...this.optionValues).center;
-  }
-
-  /**
-   * Calculates the geometric center of the Position.
-   *
-   * @name Position#center
-   * @see Center#geometric
-   * @function
-   * @return {Array} Geometric center of the Position
-   */
-  get nativeCenter(): Array<number> {
-    return Bindings('center').geometric(this.locations, ...this.optionValues)
-      .center;
   }
 
   /**
@@ -141,16 +151,5 @@ export class Position {
       Center.geometric(this.locations, ...this.optionValues).score
     ];
     return (median - center) / median;
-  }
-
-  /**
-   * Returns the values of each key of the current Position object
-   *
-   * @function
-   * @private
-   * @return {Array} Values of each key of the Position
-   */
-  private get optionValues(): Array<number | boolean> {
-    return Object.getOwnPropertyNames(this.options).map(v => this.options[v]);
   }
 }

@@ -40,6 +40,39 @@ describe('MeetHere', () => {
         process.env.GOOGLE_MAPS_TOKEN
       );
       test.meetHere.should.deep.equal([33.04373236065685, -96.81583367822624]);
+<<<<<<< HEAD
+=======
+    });
+    it('gives distances from points to center', () => {
+      const test = new MeetHere(
+        [
+          [33.0952311, -96.8640427],
+          [33.0437115, -96.8157956],
+          [33.0284505, -96.7546927]
+        ],
+        process.env.GOOGLE_MAPS_TOKEN
+      );
+      return test
+        .distance()
+        .should.eventually.be.an('Object')
+        .with.property('rows')
+        .that.is.an('Array');
+    });
+    it('gives nearby places', () => {
+      const test = new MeetHere(
+        [
+          [33.0952311, -96.8640427],
+          [33.0437115, -96.8157956],
+          [33.0284505, -96.7546927]
+        ],
+        process.env.GOOGLE_MAPS_TOKEN
+      );
+      return test
+        .nearby()
+        .should.eventually.be.an('Object')
+        .with.property('results')
+        .that.is.an('Array');
+>>>>>>> master
     });
     it('gives nearby roads', () => {
       const test = new MeetHere(
@@ -69,7 +102,7 @@ describe('MeetHere', () => {
         .should.eventually.be.an('Object')
         .with.property('snappedPoints');
     });
-    it('gives nearby places', () => {
+    it('gives timezone at center', () => {
       const test = new MeetHere(
         [
           [33.0952311, -96.8640427],
@@ -78,11 +111,11 @@ describe('MeetHere', () => {
         ],
         process.env.GOOGLE_MAPS_TOKEN
       );
-      return test
-        .nearby()
+      test
+        .timezone()
         .should.eventually.be.an('Object')
-        .with.property('results')
-        .that.is.an('Array');
+        .with.property('timeZoneId')
+        .that.equals('America/Chicago');
     });
   });
   describe('errors', () => {
@@ -99,16 +132,7 @@ describe('MeetHere', () => {
         'Missing either a valid API key, or a client ID and secret'
       );
     });
-    it('returns error for no nearby roads', () => {
-      const test = new MeetHere([], process.env.GOOGLE_MAPS_TOKEN);
-      return test
-        .roads()
-        .should.eventually.be.an('Object')
-        .with.property('error')
-        .and.property('status')
-        .that.equals('INVALID_ARGUMENT');
-    });
-    it('returns error for invalid options', () => {
+    it('returns error for invalid options on distance matrix search', () => {
       const test = new MeetHere(
         [
           [33.0952311, -96.8640427],
@@ -119,9 +143,42 @@ describe('MeetHere', () => {
       );
 
       return test
-        .nearby({ type: 'notatype' })
+        .distance({ departure_time: -100 })
         .should.eventually.be.an('Object')
         .with.property('status')
+        .that.equals('INVALID_REQUEST');
+    });
+    it('returns error for invalid options on nearby search', () => {
+      const test = new MeetHere(
+        [
+          [33.0952311, -96.8640427],
+          [33.0437115, -96.8157956],
+          [33.0284505, -96.7546927]
+        ],
+        process.env.GOOGLE_MAPS_TOKEN
+      );
+
+      return test
+        .nearby({ type: 'notatype', radius: -100 })
+        .should.eventually.be.an('Object')
+        .with.property('status')
+        .that.equals('INVALID_REQUEST');
+    });
+    it('returns error for no nearby roads', () => {
+      const test = new MeetHere([], process.env.GOOGLE_MAPS_TOKEN);
+      return test
+        .roads()
+        .should.eventually.be.an('Object')
+        .with.property('error')
+        .and.property('status')
+        .that.equals('INVALID_ARGUMENT');
+    });
+    it('returns error for invalid timestamp on timezone request', () => {
+      const test = new MeetHere([], process.env.GOOGLE_MAPS_TOKEN);
+      return test
+        .timezone({ timestamp: 0 })
+        .should.eventually.be.an('Object')
+        .and.property('status')
         .that.equals('INVALID_REQUEST');
     });
   });

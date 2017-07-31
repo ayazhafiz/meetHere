@@ -10,10 +10,10 @@ const test = [[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]];
 
 suite
   .add('Geometric JS', () => {
-    Center.geometric(test, false, 0.001, 10);
+    Center.geometric(test, true, 0.001, 10);
   })
   .add('Geometric C++', () => {
-    Cpp.geometric(test, false, 0.001, 10);
+    Cpp.geometric(test, true, 0.001, 10);
   })
   .on('cycle', event => {
     console.log(String(event.target));
