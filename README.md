@@ -79,6 +79,8 @@ yarn # or, npm install
 yarn test # or, npm test
 
 # compile
+node-gyp configure
+node-gyp build
 yarn build # or, npm run build
 ```
 
