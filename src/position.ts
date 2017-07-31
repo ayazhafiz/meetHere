@@ -1,4 +1,3 @@
-import * as Bindings from 'bindings';
 import { Center } from './namespaces/center';
 import { CenterOptions } from './interfaces/index';
 import { arrayUtil } from './util/array';

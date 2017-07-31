@@ -4,7 +4,6 @@
   "description": "A hyper-efficient library for position manipulation",
   "main": "dist/index.js",
   "scripts": {
-    "bench": "./node_modules/.bin/ts-node ./benchmark/bench.ts",
     "build": "./node_modules/.bin/tsc",
     "coverage": "./node_modules/.bin/nyc report --reporter=lcov && open coverage/lcov-report/index.html",
     "docs": "npm run build && jsdoc -c .jsdoc.json --verbose",

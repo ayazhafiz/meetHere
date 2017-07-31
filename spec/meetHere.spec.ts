@@ -39,9 +39,7 @@ describe('MeetHere', () => {
         ],
         process.env.GOOGLE_MAPS_TOKEN
       );
-      test.meetHere.should.deep.equal([33.04373236065685, -96.81583367822624]);
-<<<<<<< HEAD
-=======
+      test.meetHere.should.deep.equal([33.04509986868311, -96.81313959954981]);
     });
     it('gives distances from points to center', () => {
       const test = new MeetHere(
@@ -72,7 +70,6 @@ describe('MeetHere', () => {
         .should.eventually.be.an('Object')
         .with.property('results')
         .that.is.an('Array');
->>>>>>> master
     });
     it('gives nearby roads', () => {
       const test = new MeetHere(

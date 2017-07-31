@@ -220,5 +220,3 @@ export class MeetHere extends Position {
       .catch(error => error.json);
   }
 }
-1458000000;
-1501438730316;

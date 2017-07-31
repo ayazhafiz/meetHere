@@ -1,7 +1,14 @@
+#include <array>
 #include <cmath>
 #include <node.h>
-#include <vector>
 
+/*
+ *           (0,1)
+ *    (-s2,s2)    (s2,s2)
+ * (-1,0)      x       (1,0)
+ *    (-s2,-s2)   (s2,-s2)
+ *          (0,-1)
+ */
 const double s2 = std::sqrt(2) / 2;
 const double delta_x[] = {-1, -s2, 0, s2, 1, s2, 0, -s2};
 const double delta_y[] = {0, s2, 1, s2, 0, -s2, -1, -s2};
@@ -11,13 +18,13 @@ double cost(const double points[][2], const unsigned int &length,
   double cost = 0;
 
   for (unsigned int i = 0; i < length; ++i) {
-    cost += std::sqrt(std::pow(points[i][0] - x, 2) +
-                      std::pow(points[i][1] - y, 2));
+    cost += std::sqrt(std::pow((points[i][0] - x), 2) +
+                      std::pow((points[i][1] - y), 2));
   }
   return cost;
 }
 
-std::vector<double> centerOfMass(const double points[][2],
+std::array<double, 2> centerOfMass(const double points[][2],
                                  const unsigned int &length) {
   double x = 0;
   double y = 0;
@@ -27,12 +34,17 @@ std::vector<double> centerOfMass(const double points[][2],
     y += points[i][1];
   }
 
-  std::vector<double> com;
-  com.push_back(x /= length);
-  com.push_back(y /= length);
-  return com;
+  return {{x / length, y / length}};
 }
 
+/**
+ * Calculates the geometric center of an arbitrary amount of points.
+ *
+ * This is done through a simple Newtonian search. We iterate an indiscriminate
+ * amount of times through smaller bounds until we approve some margin of error
+ * (epsilon). Note that local maxima is a non-issue, as the geometric median is
+ * (unique and covergent for non-co-linear points)[http://www.stat.rutgers.edu/home/cunhui/papers/39.pdf].
+ */
 void geometric(const v8::FunctionCallbackInfo<v8::Value> &args) {
   v8::Isolate *isolate = args.GetIsolate();
 
@@ -51,7 +63,7 @@ void geometric(const v8::FunctionCallbackInfo<v8::Value> &args) {
   double epsilon = args[2]->NumberValue();
   double bounds = args[3]->NumberValue();
 
-  std::vector<double> center = centerOfMass(points, length);
+  std::array<double, 2> center = centerOfMass(points, length);
   double score = cost(points, length, center[0], center[1]);
   double step = score / length * bounds;
 

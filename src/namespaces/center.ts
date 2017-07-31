@@ -1,3 +1,5 @@
+import * as Bindings from 'bindings';
+
 /**
  * Utilities for determining centers of sets of points
  *
@@ -85,34 +87,6 @@ export namespace Center {
     epsilon: number,
     bounds: number
   ): { center: Array<number>; score: number } {
-    // Initially, our center is the median and our score is that of the median.
-    const com = mass(points);
-    let [center, score] = [com.center, com.score];
-
-    // Assign a step `bounds` times the average center-to-point distance for
-    // improved coverage.
-    let step = score / points.length * bounds;
-
-    while (step > epsilon) {
-      let improved = false;
-      for (let i = 0; i < delta.x.length; subsearch ? ++i : (i += 2)) {
-        const _nx = center[0] + step * delta.x[i];
-        const _ny = center[1] + step * delta.y[i];
-        const _nScore = cost(points, _nx, _ny);
-
-        // If the algorithm has improved our score, we apply it...
-        if (_nScore < score) {
-          [center, score] = [[_nx, _ny], _nScore];
-          improved = true;
-          break;
-        }
-      }
-
-      // ...otherwise, we decrease our step.
-      if (!improved) {
-        step /= 2;
-      }
-    }
-    return { center: center, score: score };
+    return Bindings('center').geometric(points, subsearch, epsilon, bounds);
   }
 }
