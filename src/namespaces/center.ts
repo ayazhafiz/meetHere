@@ -1,4 +1,5 @@
 import * as Bindings from 'bindings';
+const Native = Bindings('center');
 
 /**
  * Utilities for determining centers of sets of points
@@ -76,9 +77,9 @@ export namespace Center {
    * @name Center#geometric
    * @function
    * @param {Array} points 2D Array of points on a plane
-   * @param {boolean} [subsearch=false] Whether to search for efficiencies obliquely
-   * @param {number} [epsilon=1e-3] Precision of geometric center
-   * @param {number} [bounds=10] Starting unit bounds for center calculation
+   * @param {boolean} subsearch Whether to search for efficiencies obliquely
+   * @param {number} epsilon Precision of geometric center
+   * @param {number} bounds Starting unit bounds for center calculation
    * @return {object} Geometric center
    */
   export function geometric(
@@ -87,6 +88,6 @@ export namespace Center {
     epsilon: number,
     bounds: number
   ): { center: Array<number>; score: number } {
-    return Bindings('center').geometric(points, subsearch, epsilon, bounds);
+    return Native.geometric(points, subsearch, epsilon, bounds);
   }
 }

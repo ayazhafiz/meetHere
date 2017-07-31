@@ -57,17 +57,6 @@ export class Position {
   }
 
   /**
-   * Returns the values of each key of the current Position object
-   *
-   * @function
-   * @private
-   * @return {Array} Values of each key of the Position
-   */
-  private get optionValues(): Array<number | boolean> {
-    return Object.getOwnPropertyNames(this.options).map(v => this.options[v]);
-  }
-
-  /**
    * Adds a location to the set of points.
    *
    * @name Position#add
@@ -120,7 +109,12 @@ export class Position {
    * @return {Array} Geometric center of the Position
    */
   get center(): Array<number> {
-    return Center.geometric(this.locations, ...this.optionValues).center;
+    return Center.geometric(
+      this.locations,
+      this.options.subsearch,
+      this.options.epsilon,
+      this.options.bounds
+    ).center;
   }
 
   /**
@@ -147,7 +141,12 @@ export class Position {
   get score(): number {
     const [median, center] = [
       Center.mass(this.locations).score,
-      Center.geometric(this.locations, ...this.optionValues).score
+      Center.geometric(
+        this.locations,
+        this.options.subsearch,
+        this.options.epsilon,
+        this.options.bounds
+      ).score
     ];
     return (median - center) / median;
   }
