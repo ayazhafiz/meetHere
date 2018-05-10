@@ -1,15 +1,13 @@
 import { CenterOptions } from './interfaces/index';
-import { arrayUtil } from './util/array';
+import { arrayUtil as importArrayUtil } from './util/array';
 import * as Bindings from 'bindings';
-const CENTER = Bindings('center');
-const POLYNOMIAL = Bindings('polynomial');
-const TSP = Bindings('tsp');
+const CLIB = Bindings('api');
 const Method = {
-  tsp: 116,
-  naiveVrp: 110
+  tsp: 't'.charCodeAt(0),
+  naiveVrp: 'n'.charCodeAt(0),
 };
 
-arrayUtil();
+importArrayUtil();
 
 /**
  * A prototype describing a set of points on a plane.
@@ -50,7 +48,7 @@ class Position {
     epsilon: 1e-3,
     bounds: 10,
     startIndex: 0,
-    degree: null
+    degree: null,
   };
 
   /**
@@ -140,18 +138,18 @@ class Position {
    * ```
    */
   get center(): Array<number> {
-    return CENTER.geometric(
+    return CLIB.geometric(
       this.locations,
       this.options.subsearch,
       this.options.epsilon,
-      this.options.bounds
+      this.options.bounds,
     ).center;
   }
 
   /**
-   * Calculates the median (center of mass) of the Position.
+   * Calculates the mean of the Position.
    *
-   * @name Position#median
+   * @name Position#mean
    * @desc a rudimentary estimate for Position#center
    * @function
    * @return {Array} Geometric center of the Position
@@ -161,8 +159,8 @@ class Position {
    * plane.center; // => [0.33333, 0.33333]
    * ```
    */
-  get median(): Array<number> {
-    return CENTER.mass(this.locations).center;
+  get mean(): Array<number> {
+    return CLIB.mean(this.locations).center;
   }
 
   /**
@@ -181,7 +179,7 @@ class Position {
    * ```
    */
   get bestPath(): Array<number> {
-    return TSP.tsp(this.locations, this.options.startIndex, Method['tsp']);
+    return CLIB.tsp(this.locations, this.options.startIndex, Method['tsp']);
   }
 
   /**
@@ -200,7 +198,11 @@ class Position {
    * plane.quickPath; // => [0, 2, 1]
    */
   get quickPath() {
-    return TSP.tsp(this.locations, this.options.startIndex, Method['naiveVrp']);
+    return CLIB.tsp(
+      this.locations,
+      this.options.startIndex,
+      Method['naiveVrp'],
+    );
   }
 
   /**
@@ -219,23 +221,23 @@ class Position {
    * ```
    */
   get polynomial(): Array<number> {
-    return POLYNOMIAL.bestFit(this.locations, this.options.degree);
+    return CLIB.bestFit(this.locations, this.options.degree);
   }
 
   /**
-   * Calculates the net cost of travelling from the points to their median.
+   * Calculates the net cost of travelling from the points to their mean.
    *
-   * @name Position#medianCost
+   * @name Position#meanCost
    * @function
    * @return {number} Cost of travelling
    *
    * ```
    * let plane = new Position([[0, 1], [1, 14], [2, 45]]);
-   * plane.medianCost; // => 50.04629
+   * plane.meanCost; // => 50.04629
    * ```
    */
-  get medianCost(): number {
-    return CENTER.mass(this.locations).score;
+  get meanCost(): number {
+    return CLIB.mean(this.locations).score;
   }
 
   /**
@@ -252,17 +254,17 @@ class Position {
    * ```
    */
   get centerCost(): number {
-    return CENTER.geometric(
+    return CLIB.geometric(
       this.locations,
       this.options.subsearch,
       this.options.epsilon,
-      this.options.bounds
+      this.options.bounds,
     ).score;
   }
 
   /**
    * Calculates the percent improvement of Position#center as compared to
-   * Position#median in each dimension.
+   * Position#mean in each dimension.
    *
    * @name Position#geometricSignificance
    * @function
@@ -274,9 +276,9 @@ class Position {
    * ```
    */
   get geometricSignificance(): number {
-    const [median, center] = [this.medianCost, this.centerCost];
-    return (median - center) / median;
+    const [mean, center] = [this.meanCost, this.centerCost];
+    return (mean - center) / mean;
   }
 }
 
-export { Bindings, Position };
+export { Position, CLIB };

@@ -5,19 +5,22 @@
   "main": "dist/index.js",
   "gypfile": true,
   "scripts": {
+    "beautify":
+      "./node_modules/.bin/prettier --write ./**/*.ts && clang-format -i ./src/native/**/*.{c,h} ./src/native/wrapper/*.{cpp,h}",
     "build": "./node_modules/.bin/tsc",
-    "compile":
-      "rm -rf build && node-gyp configure && node-gyp rebuild && npm test",
+    "compile": "rm -rf build && node-gyp configure && node-gyp rebuild",
     "coverage":
       "./node_modules/.bin/nyc report --reporter=lcov && open coverage/lcov-report/index.html",
     "docs":
       "npm run build && ./node_modules/.bin/jsdoc -c .jsdoc.json --verbose",
-    "prepare": "npm run build",
+    "ftest": "npm run compile && npm run tstest",
     "posttest":
       "./node_modules/.bin/nyc report --reporter=text-lcov | coveralls",
-    "test":
+    "test": "npm run tstest",
+    "tstest":
       "./node_modules/.bin/nyc ./node_modules/.bin/mocha ./spec/*.spec.ts -t 5000"
   },
+  "pre-commit": ["beautify", "compile", "tstest"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ayazhafiz/meetHere.git"
@@ -29,8 +32,7 @@
   },
   "homepage": "https://github.com/ayazhafiz/meetHere#readme",
   "dependencies": {
-    "@google/maps": "^0.4.3",
-    "jsdoc": "^3.5.5"
+    "@google/maps": "^0.4.3"
   },
   "devDependencies": {
     "@types/chai": "^4.0.1",
@@ -42,9 +44,12 @@
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^2.13.1",
+    "jsdoc": "^3.5.5",
     "minami": "^1.2.3",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
+    "pre-commit": "^1.2.2",
+    "prettier": "1.12.1",
     "ts-node": "^3.3.0",
     "typescript": "^2.4.2"
   },

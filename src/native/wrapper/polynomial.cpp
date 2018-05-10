@@ -1,13 +1,12 @@
-#include "../polynomial.h"
-#include "../util.h"
-#include <node.h>
+#include "polynomial.h"
 
-namespace Polynomial
+extern "C"
 {
-/**
- * Calculates the best-fit polynomial function of an arbitrary set of points.
- */
-void wrapBestFit(const v8::FunctionCallbackInfo<v8::Value> & args)
+#include "../polynomial.h"
+}
+
+void PolynomialWrapper::bestFit(
+    const v8::FunctionCallbackInfo<v8::Value> & args)
 {
   v8::Isolate * isolate = args.GetIsolate();
 
@@ -25,12 +24,11 @@ void wrapBestFit(const v8::FunctionCallbackInfo<v8::Value> & args)
 
   size_t degree = args[1]->Uint32Value();
   if (!degree) {
-    degree = guessPolynomialDegree(xPos, yPos, numPoints);
+    degree = Polynomial.guess_degree(xPos, yPos, numPoints);
   }
 
   // calculate polynomial
-  double coeffs[degree + 1];
-  fillBestFit(xPos, yPos, numPoints, degree, coeffs);
+  double * coeffs = Polynomial.best_fit(xPos, yPos, numPoints, degree);
 
   // pass coeffs back to JS Array
   v8::Local<v8::Array> _coeffs = v8::Array::New(isolate);
@@ -39,13 +37,6 @@ void wrapBestFit(const v8::FunctionCallbackInfo<v8::Value> & args)
   }
 
   args.GetReturnValue().Set(_coeffs);
+
+  delete[] coeffs;
 }
-
-void init(v8::Local<v8::Object> exports)
-{
-  NODE_SET_METHOD(exports, "bestFit", wrapBestFit);
-}
-
-NODE_MODULE(addon, init);
-
-}  // namespace Polynomial

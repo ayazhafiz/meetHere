@@ -1,14 +1,36 @@
-#include "../center.h"
-#include "../tsp.h"
-#include "../util.h"
-#include <node.h>
+#include "tsp.h"
 
-namespace TSP
+extern "C"
 {
+#include "../tsp.h"
+}
+
 /**
- * Determines the shortest-travel path between planar points.
+ * @brief   Returns the degree of norm corresponding to a method of the
+ *          Travelling Salesman Problem.
+ *
+ * @param   m      method
+ *
+ * @return  the degree of norm to use
  */
-void wrapTSP(const v8::FunctionCallbackInfo<v8::Value> & args)
+size_t visitMethod(const char m)
+{
+  switch (m) {
+    case 't':  // TSP
+      return 2;
+    case 'n':  // Naive VRP
+      return 1;
+
+    default:
+      return 2;
+  }
+}
+
+/**
+ * @brief   Determines the shortest-travel path between planar points,
+ *          interfaced with Node.js.
+ */
+void TSPWrapper::solve(const v8::FunctionCallbackInfo<v8::Value> & args)
 {
   v8::Isolate * isolate = args.GetIsolate();
 
@@ -18,67 +40,26 @@ void wrapTSP(const v8::FunctionCallbackInfo<v8::Value> & args)
   const size_t         startCity = args[1]->Uint32Value();
   const char           method    = (char)(args[2]->Uint32Value());
 
-  // setup visited-cities
-  bool visited[numPoints];
+  // pass locations to C++ array
+  double points[numPoints][2];
   for (size_t i = 0; i < numPoints; ++i) {
-    visited[i] = false;
+    v8::Local<v8::Array> _element = v8::Local<v8::Array>::Cast(_points->Get(i));
+    points[i][0]                  = _element->Get(0)->NumberValue();
+    points[i][1]                  = _element->Get(1)->NumberValue();
   }
 
-  // setup cost matrix
-  Util::DoubleArr2D costMatrix = new Util::DoubleArr[numPoints];
+  size_t * order = TSP.solve((const double **)points,
+                             numPoints,
+                             2,
+                             startCity,
+                             visitMethod(method));
+
+  v8::Local<v8::Array> _order = v8::Array::New(isolate);
   for (size_t i = 0; i < numPoints; ++i) {
-    costMatrix[i] = new double[numPoints];
+    _order->Set(i, v8::Number::New(isolate, order[i]));
   }
 
-  const size_t matrixLen = 1;
+  delete[] order;
 
-  // fill cost matrix
-  for (size_t i = 0; i < numPoints; ++i) {
-    for (size_t j = 0; j < numPoints; ++j) {
-      double to[matrixLen][2];
-      double from[2];
-      for (size_t k = 0; k < 2; ++k) {
-        to[0][k] =
-            v8::Local<v8::Array>::Cast(_points->Get(j))->Get(k)->NumberValue();
-        from[k] =
-            v8::Local<v8::Array>::Cast(_points->Get(i))->Get(k)->NumberValue();
-      }
-
-      switch (method) {
-        case VisitMethod::tsp:
-          costMatrix[i][j] = Center::cost(from[0], from[1], to, matrixLen);
-        case VisitMethod::naiveVrp:
-          costMatrix[i][j] =
-              Center::manhattanCost(from[0], from[1], to, matrixLen);
-      }
-    }
-  }
-
-  // setup order matrix
-  size_t               city  = startCity;
-  v8::Local<v8::Array> order = v8::Array::New(isolate);
-  order->Set(0, v8::Number::New(isolate, city));
-
-  // calculate nearest node (city) and add it to order matrix until every node
-  // has been visited
-  while (Util::arr_contains(visited, numPoints, false)) {
-    visited[city]     = true;
-    const int nearest = nearestCity(costMatrix, numPoints, city, visited);
-    if (nearest == -1) {
-      break;
-    }
-    order->Set(order->Length(), v8::Number::New(isolate, nearest));
-    city = nearest;
-  }
-
-  args.GetReturnValue().Set(order);
-}  // namespace TSP
-
-void init(v8::Local<v8::Object> exports)
-{
-  NODE_SET_METHOD(exports, "tsp", wrapTSP);
+  args.GetReturnValue().Set(_order);
 }
-
-NODE_MODULE(addon, init);
-
-}  // namespace Center

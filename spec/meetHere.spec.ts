@@ -13,10 +13,10 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
         process.env.GOOGLE_MAPS_TOKEN,
-        { epsilon: 1e-6 }
+        { epsilon: 1e-6 },
       );
       expect(test)
         .to.have.property('locations')
@@ -24,7 +24,7 @@ describe('MeetHere', () => {
         .that.deep.equals([
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ]);
       expect(test)
         .to.have.property('client')
@@ -40,9 +40,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       test.meetHere.should.deep.equal([33.04373236065685, -96.81583367822624]);
     });
@@ -51,9 +51,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       it('works', () => {
         return test
@@ -75,9 +75,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       it('works', () => {
         return test
@@ -99,23 +99,23 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       return test
         .roads()
         .should.eventually.be.an('Object')
         .with.property('snappedPoints');
     });
-    it('gives nearby roads with median', () => {
+    it('gives nearby roads with mean', () => {
       const test = new MeetHere(
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       return test
         .roads(false)
@@ -127,9 +127,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       it('works', () => {
         return test
@@ -151,9 +151,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
       it('works', () => {
         return test
@@ -177,9 +177,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
 
       return test
@@ -193,9 +193,9 @@ describe('MeetHere', () => {
         [
           [33.0952311, -96.8640427],
           [33.0437115, -96.8157956],
-          [33.0284505, -96.7546927]
+          [33.0284505, -96.7546927],
         ],
-        process.env.GOOGLE_MAPS_TOKEN
+        process.env.GOOGLE_MAPS_TOKEN,
       );
 
       return test

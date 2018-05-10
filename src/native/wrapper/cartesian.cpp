@@ -1,12 +1,28 @@
-#include "../cartesian.h"
-#include <node.h>
+#include "cartesian.h"
 
-namespace Cartesian
+extern "C"
 {
+#include "../cartesian.h"
+}
+
+static const double PI = 3.14159265358979323846;
+
 /**
- * Calculates the Cartesian (Earthly) distance between two Lat/Lng points.
+ * @brief  Returns the radian measurement of a degree value
+ * @param  degrees the degree measurement
+ * @return the radian equivalent of the degrees
  */
-void distance(const v8::FunctionCallbackInfo<v8::Value> & args)
+double degtorad(double degrees)
+{
+  return degrees / 180 * PI;
+}
+
+/**
+ * @brief   Calculates the cartesian (earthly) distance between two lat/lng
+ *          points, interfaced with Node.js.
+ */
+void CartesianWrapper::distance(
+    const v8::FunctionCallbackInfo<v8::Value> & args)
 {
   v8::Isolate * isolate = args.GetIsolate();
 
@@ -34,15 +50,19 @@ void distance(const v8::FunctionCallbackInfo<v8::Value> & args)
   // record distances from each location to center
   v8::Local<v8::Array> distances = v8::Array::New(isolate);
   for (size_t i = 0; i < length; ++i) {
-    // latitudes
-    const double lat1 = radiansFromDeg(center[0]);
-    const double lat2 = radiansFromDeg(points[i][0]);
+    // start lat, lng
+    const double sLat = degtorad(center[0]);
+    const double sLng = degtorad(center[1]);
 
-    // dLat, dLng
-    const double dlat = radiansFromDeg(points[i][0] - center[0]);
-    const double dlng = radiansFromDeg(points[i][1] - center[1]);
+    // end lat, lng
+    const double eLat = degtorad(points[i][0]);
+    const double eLng = degtorad(points[i][1]);
 
-    const double distance = haversine(lat1, lat2, dlat, dlng, unit);
+    const double distance = Cartesian.haversine_distance(sLat,
+                                                         sLng,
+                                                         eLat,
+                                                         eLng,
+                                                         unit);
 
     distances->Set(i, v8::Number::New(isolate, distance));
   }
@@ -55,12 +75,3 @@ void distance(const v8::FunctionCallbackInfo<v8::Value> & args)
 
   args.GetReturnValue().Set(result);
 }
-
-void init(v8::Local<v8::Object> exports)
-{
-  NODE_SET_METHOD(exports, "distance", distance);
-}
-
-NODE_MODULE(addon, init);
-
-}  // namespace Cartesian

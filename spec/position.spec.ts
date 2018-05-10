@@ -48,21 +48,21 @@ describe('Position', () => {
       const test = new Position([[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]]);
       expect(test.center).to.deep.equal([
         0.9998479030807611,
-        2.000560357070879
+        2.000560357070879,
       ]);
     });
     it('finds geometric center of points with oblique search', () => {
       const test = new Position([[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]], {
-        subsearch: true
+        subsearch: true,
       });
       expect(test.center).to.deep.equal([
         0.9999063853985626,
-        2.001119760004479
+        2.001119760004479,
       ]);
     });
-    it('finds median of points', () => {
+    it('finds mean of points', () => {
       const test = new Position([[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]]);
-      expect(test.median).to.deep.equal([0.525, 3.75]);
+      expect(test.mean).to.deep.equal([0.525, 3.75]);
     });
     it('finds shortest path between paths', () => {
       const test = new Position([
@@ -76,7 +76,7 @@ describe('Position', () => {
         [0, 2.1],
         [8.9, 7.6],
         [6.3, 8.1],
-        [9, 2.8]
+        [9, 2.8],
       ]);
       expect(test.bestPath).to.deep.equal([0, 2, 7, 1, 4, 5, 9, 3, 6, 8, 10]);
     });
@@ -92,21 +92,21 @@ describe('Position', () => {
         [0, 2.1],
         [8.9, 7.6],
         [6.3, 8.1],
-        [9, 2.8]
+        [9, 2.8],
       ]);
       expect(test.quickPath).to.deep.equal([0, 2, 7, 1, 4, 5, 9, 3, 6, 8, 10]);
     });
     it('calculates polynomial', () => {
-      const test = new Position([[1, 2], [5, 6.6], [-7, 8.1], [3.1, -1.7]]);
-      expect(test.polynomial.map(v => Math.round(v * 1e6) / 1e6)).to.deep.equal(
-        [6.405511, -4.836808, 0.295336, 0.135961]
-      );
+      const test = new Position([[0, 1], [1, 2], [3, 10]]);
+      expect(
+        test.polynomial.map((v) => Math.round(v * 1e6) / 1e6),
+      ).to.deep.equal([1, -0, 1]);
     });
   });
   describe('calculates cost', () => {
-    it('calculates cost for median', () => {
+    it('calculates cost for mean', () => {
       const test = new Position([[0, 0], [0, 1], [1, 0]]);
-      expect(test.medianCost).to.equal(1.9621165057908914);
+      expect(test.meanCost).to.equal(1.9621165057908914);
     });
     it('calculates cost for center', () => {
       const test = new Position([[0, 0], [0, 1], [1, 0]]);

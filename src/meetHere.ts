@@ -1,18 +1,15 @@
-import { Bindings, Position } from './position';
+import { Position, CLIB } from './position';
 import { createClient } from '@google/maps';
 import {
   GoogleMapsClient,
   CenterOptions,
   DistanceOptions,
   PlacesOptions,
-  TimeZoneOptions
+  TimeZoneOptions,
 } from './interfaces/index';
-const CARTESIAN = Bindings('cartesian');
-const KM = 'km';
-const MI = 'mi';
-const asciiDistanceUnits = {
-  km: 107,
-  mi: 109
+const unitType = {
+  km: 'k'.charCodeAt(0),
+  mi: 'm'.charCodeAt(0),
 };
 
 /**
@@ -59,7 +56,7 @@ class MeetHere extends Position {
     epsilon: 1e-4,
     bounds: 10,
     startIndex: 0,
-    degree: null
+    degree: null,
   };
 
   /**
@@ -81,7 +78,7 @@ class MeetHere extends Position {
    */
   static defaultPlacesOptions: PlacesOptions = {
     language: 'English',
-    rankby: 'distance'
+    rankby: 'distance',
   };
 
   /**
@@ -93,7 +90,7 @@ class MeetHere extends Position {
    * @default
    */
   static defaultTimeZoneOptions: TimeZoneOptions = {
-    timestamp: null
+    timestamp: null,
   };
 
   /**
@@ -109,7 +106,7 @@ class MeetHere extends Position {
   constructor(
     locations: Array<Array<number>>,
     token: string,
-    options: CenterOptions = {}
+    options: CenterOptions = {},
   ) {
     super(locations, { ...MeetHere.defaultCenterOptions, ...options });
     this.client = createClient({ key: token, Promise: Promise });
@@ -120,11 +117,11 @@ class MeetHere extends Position {
    *
    * @function
    * @private
-   * @param {boolean} geometric Whether to use geometric/median center
+   * @param {boolean} geometric Whether to use geometric/mean center
    * @return {Array} The center of the MeetHere
    */
   private middle(geometric: boolean): Array<number> {
-    return geometric ? this.center : this.median;
+    return geometric ? this.center : this.mean;
   }
 
   /**
@@ -151,7 +148,7 @@ class MeetHere extends Position {
    * @name MeetHere#distance
    * @function
    * @param {string} [units='km'] Units of distance to use, can be 'km' or 'mi'
-   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @param {boolean} [geometric=true] Whether to use geometric center or mean
    * @return {Object.<string, Array>} A Promise that will yield distances or
    * an error
    *
@@ -163,17 +160,17 @@ class MeetHere extends Position {
    * ```
    */
   distanceMatrix(
-    units: string = KM,
-    geometric: boolean = true
+    units: string = 'km',
+    geometric: boolean = true,
   ): {
     origins: Array<number>;
     destinations: Array<number>;
     distances: Array<number>;
   } {
-    return CARTESIAN.distance(
+    return CLIB.distance(
       this.locations,
       this.middle(geometric),
-      asciiDistanceUnits[units]
+      unitType[units],
     );
   }
 
@@ -186,19 +183,19 @@ class MeetHere extends Position {
    * @async
    * @param {PlacesOptions} [options=MeetHere.defaultPlacesOptions] Options to
    * apply to search request, can be any of @see
-   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @param {boolean} [geometric=true] Whether to use geometric center or mean
    * @return {Promise} A Promise that will yield nearby places or an error
    */
   async nearby(
     options: PlacesOptions = {},
-    geometric: boolean = true
+    geometric: boolean = true,
   ): Promise<object> {
     options['location'] = this.middle(geometric);
     return await this.client
       .placesNearby({ ...MeetHere.defaultPlacesOptions, ...options })
       .asPromise()
-      .then(response => response.json)
-      .catch(error => error.json);
+      .then((response) => response.json)
+      .catch((error) => error.json);
   }
 
   /**
@@ -207,7 +204,7 @@ class MeetHere extends Position {
    * @name MeetHere#roads
    * @function
    * @async
-   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @param {boolean} [geometric=true] Whether to use geometric center or mean
    * @return {Promise} A Promise that will yield nearby roads or an error
    */
   async roads(geometric: boolean = true): Promise<object> {
@@ -215,8 +212,8 @@ class MeetHere extends Position {
     return await this.client
       .nearestRoads({ points: [center] })
       .asPromise()
-      .then(response => response.json)
-      .catch(error => error.json);
+      .then((response) => response.json)
+      .catch((error) => error.json);
   }
 
   /**
@@ -228,12 +225,12 @@ class MeetHere extends Position {
    * @async
    * @param {TimeZoneOptions} [options=MeetHere.defaultTimeZoneOptions] Options
    * to apply to timezone request, can be any of @see
-   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @param {boolean} [geometric=true] Whether to use geometric center or mean
    * @return {Promise} A Promise that will yield time offset data or an error
    */
   async timezone(
     options: TimeZoneOptions = {},
-    geometric: boolean = true
+    geometric: boolean = true,
   ): Promise<object> {
     options['location'] = this.middle(geometric);
     options = { ...MeetHere.defaultTimeZoneOptions, ...options };
@@ -241,8 +238,8 @@ class MeetHere extends Position {
     return await this.client
       .timezone(options)
       .asPromise()
-      .then(response => response.json)
-      .catch(error => error.json);
+      .then((response) => response.json)
+      .catch((error) => error.json);
   }
 
   /**
@@ -255,23 +252,23 @@ class MeetHere extends Position {
    * @async
    * @param {DistanceOptions} [options=MeetHere.defaultDistanceOptions] Options
    * to apply to distance matrix request, can be any of @see
-   * @param {boolean} [geometric=true] Whether to use geometric or median center
+   * @param {boolean} [geometric=true] Whether to use geometric center or mean
    * @return {Promise} A Promise that will yield the distance matrix or an error
    */
   async travel(
     options: DistanceOptions = {},
-    geometric: boolean = true
+    geometric: boolean = true,
   ): Promise<object> {
     options['origins'] = this.locations;
     options['destinations'] = [this.middle(geometric)];
     return await this.client
       .distanceMatrix({
         ...MeetHere.defaultDistanceOptions,
-        ...options
+        ...options,
       })
       .asPromise()
-      .then(response => response.json)
-      .catch(error => error.json);
+      .then((response) => response.json)
+      .catch((error) => error.json);
   }
 }
 
