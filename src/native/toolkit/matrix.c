@@ -5,10 +5,6 @@
 
 #include <stdlib.h>
 
-//
-// HELPERS
-//
-
 #ifndef __D_swap
 #define __D_swap(a, b, type) \
   {                          \
@@ -17,10 +13,6 @@
     b           = __swap;    \
   }
 #endif
-
-//
-// MAIN
-//
 
 /**
  * @brief   Performs in-place gaussian elimination on an augmented matrix.
@@ -39,14 +31,14 @@
  * @param   dimension        the dimension of the submatrix and vector
  *                           comprising the augmented matrix
  */
-static void eliminate_gaussian(double * matrix, const size_t dim)
+static void eliminate_gaussian(double * matrix, const uint64_t dim)
 {
-  const size_t cols = dim + 1;
-  for (size_t i = 0; i < dim; ++i) {
-    for (size_t j = i + 1; j < dim; ++j) {
+  const uint64_t cols = dim + 1;
+  for (uint64_t i = 0; i < dim; ++i) {
+    for (uint64_t j = i + 1; j < dim; ++j) {
       // swap rows if not in descending order
       if (matrix[Array.idx_2d(j, i, cols)] > matrix[Array.idx_2d(i, i, cols)]) {
-        for (size_t k = 0; k <= dim; ++k) {
+        for (uint64_t k = 0; k <= dim; ++k) {
           __D_swap(matrix[Array.idx_2d(i, k, cols)],
                    matrix[Array.idx_2d(j, k, cols)],
                    double);
@@ -56,7 +48,7 @@ static void eliminate_gaussian(double * matrix, const size_t dim)
       // eliminate lower row
       const double ratio = matrix[Array.idx_2d(j, i, cols)] /
                            matrix[Array.idx_2d(i, i, cols)];
-      for (size_t k = 0; k <= dim; ++k) {
+      for (uint64_t k = 0; k <= dim; ++k) {
         matrix[Array.idx_2d(j, k, cols)] -= ratio *
                                             matrix[Array.idx_2d(i, k, cols)];
       }
@@ -78,18 +70,18 @@ static void eliminate_gaussian(double * matrix, const size_t dim)
  * @return  a pointer to the values of the solution vector
  */
 static double * solve_reduced_augmented(const double * matrix,
-                                        const size_t   dimension)
+                                        const uint64_t dimension)
 {
-  const size_t cols     = dimension + 1;
-  double *     solution = Array.New.double_array(dimension);
+  const uint64_t cols     = dimension + 1;
+  double *       solution = Array.New.double_array(dimension);
 
   // perform backwards substitution
-  for (size_t i = dimension; i > 0; --i) {
-    const size_t row = i - 1;
-    solution[row]    = matrix[Array.idx_2d(row, dimension, cols)];
+  for (uint64_t i = dimension; i > 0; --i) {
+    const uint64_t row = i - 1;
+    solution[row]      = matrix[Array.idx_2d(row, dimension, cols)];
 
     // subtract influence of all following coefficients
-    for (size_t j = i; j < dimension; ++j) {
+    for (uint64_t j = i; j < dimension; ++j) {
       solution[row] -= matrix[Array.idx_2d(row, j, cols)] * solution[j];
     }
 
@@ -115,17 +107,17 @@ static double * solve_reduced_augmented(const double * matrix,
  * @return  a pointer to the cost matrix
  */
 static double * cost_matrix(const double * vectors,
-                            const size_t   num_vectors,
-                            const size_t   dimension,
-                            const size_t   norm_degree)
+                            const uint64_t num_vectors,
+                            const uint64_t dimension,
+                            const uint64_t norm_degree)
 {
   double * cost_matrix = Array.New.double_array(num_vectors * num_vectors);
 
-  for (size_t i = 0; i < num_vectors; ++i) {
-    for (size_t j = 0; j < num_vectors; ++j) {
+  for (uint64_t i = 0; i < num_vectors; ++i) {
+    for (uint64_t j = 0; j < num_vectors; ++j) {
       double start[dimension];
       double end[dimension];
-      for (size_t p = 0; p < dimension; ++p) {
+      for (uint64_t p = 0; p < dimension; ++p) {
         start[p] = vectors[Array.idx_2d(i, p, dimension)];
         end[p]   = vectors[Array.idx_2d(j, p, dimension)];
       }
@@ -141,10 +133,6 @@ static double * cost_matrix(const double * vectors,
   return cost_matrix;
 }
 
-//
-// WRAPPERS
-//
-
 /**
  * @brief   Wraps eliminate_gaussian for a better user API.
  *
@@ -152,7 +140,8 @@ static double * cost_matrix(const double * vectors,
  * @param   dimension        the dimension of the submatrix and vector
  *                           comprising the augmented matrix
  */
-static void __WRAP_eliminate_gaussian(double * matrix[], const size_t dimension)
+static void __WRAP_eliminate_gaussian(double *       matrix[],
+                                      const uint64_t dimension)
 {
   eliminate_gaussian((double *)matrix, dimension);
 }
@@ -167,7 +156,7 @@ static void __WRAP_eliminate_gaussian(double * matrix[], const size_t dimension)
  * @return  a pointer to the values of the solution vector
  */
 static double * __WRAP_solve_reduced_augmented(const double * matrix[],
-                                               const size_t   dimension)
+                                               const uint64_t dimension)
 {
   return solve_reduced_augmented((double *)matrix, dimension);
 }
@@ -184,9 +173,9 @@ static double * __WRAP_solve_reduced_augmented(const double * matrix[],
  * @return  a pointer to the cost matrix
  */
 static double * __WRAP_cost_matrix(const double * vectors[],
-                                   const size_t   num_vectors,
-                                   const size_t   dimension,
-                                   const size_t   norm_degree)
+                                   const uint64_t num_vectors,
+                                   const uint64_t dimension,
+                                   const uint64_t norm_degree)
 {
   return cost_matrix((double *)vectors, num_vectors, dimension, norm_degree);
 }

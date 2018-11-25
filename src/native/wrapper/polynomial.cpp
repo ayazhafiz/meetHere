@@ -11,18 +11,18 @@ void PolynomialWrapper::bestFit(
   v8::Isolate * isolate = args.GetIsolate();
 
   v8::Local<v8::Array> _points   = v8::Local<v8::Array>::Cast(args[0]);
-  const size_t         numPoints = _points->Length();
+  const uint64_t       numPoints = _points->Length();
   double               xPos[numPoints];
   double               yPos[numPoints];
   v8::Local<v8::Array> orig;
 
-  for (size_t i = 0; i < numPoints; ++i) {
+  for (uint64_t i = 0; i < numPoints; ++i) {
     orig    = v8::Local<v8::Array>::Cast(_points->Get(i));
     xPos[i] = orig->Get(0)->NumberValue();
     yPos[i] = orig->Get(1)->NumberValue();
   }
 
-  size_t degree = args[1]->Uint32Value();
+  uint64_t degree = args[1]->Uint32Value();
   if (!degree) {
     degree = Polynomial.guess_degree(xPos, yPos, numPoints);
   }

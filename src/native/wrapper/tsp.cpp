@@ -13,7 +13,7 @@ extern "C"
  *
  * @return  the degree of norm to use
  */
-size_t visitMethod(const char m)
+uint64_t visitMethod(const char m)
 {
   switch (m) {
     case 't':  // TSP
@@ -36,26 +36,26 @@ void TSPWrapper::solve(const v8::FunctionCallbackInfo<v8::Value> & args)
 
   // get args
   v8::Local<v8::Array> _points   = v8::Local<v8::Array>::Cast(args[0]);
-  const size_t         numPoints = _points->Length();
-  const size_t         startCity = args[1]->Uint32Value();
+  const uint64_t       numPoints = _points->Length();
+  const uint64_t       startCity = args[1]->Uint32Value();
   const char           method    = (char)(args[2]->Uint32Value());
 
   // pass locations to C++ array
   double points[numPoints][2];
-  for (size_t i = 0; i < numPoints; ++i) {
+  for (uint64_t i = 0; i < numPoints; ++i) {
     v8::Local<v8::Array> _element = v8::Local<v8::Array>::Cast(_points->Get(i));
     points[i][0]                  = _element->Get(0)->NumberValue();
     points[i][1]                  = _element->Get(1)->NumberValue();
   }
 
-  size_t * order = TSP.solve((const double **)points,
-                             numPoints,
-                             2,
-                             startCity,
-                             visitMethod(method));
+  uint64_t * order = TSP.solve((const double **)points,
+                               numPoints,
+                               2,
+                               startCity,
+                               visitMethod(method));
 
   v8::Local<v8::Array> _order = v8::Array::New(isolate);
-  for (size_t i = 0; i < numPoints; ++i) {
+  for (uint64_t i = 0; i < numPoints; ++i) {
     _order->Set(i, v8::Number::New(isolate, order[i]));
   }
 

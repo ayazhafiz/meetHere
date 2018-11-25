@@ -1,7 +1,7 @@
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 
-#include <stddef.h>
+#include <stdint.h>
 
 struct polynomial
 {
@@ -17,7 +17,9 @@ struct polynomial
    *
    * @return  best degree of polynomial to approximate
    */
-  size_t (*guess_degree)(const double x[], const double y[], size_t num_points);
+  uint64_t (*guess_degree)(const double x[],
+                           const double y[],
+                           uint64_t     num_points);
 
   /**
    * @brief   Calculates the best-fit polynomial function for a set of 2D
@@ -54,8 +56,8 @@ struct polynomial
    */
   double * (*best_fit)(const double x_points[],
                        const double y_points[],
-                       size_t       num_points,
-                       size_t       polynomial_degree);
+                       uint64_t     num_points,
+                       uint64_t     polynomial_degree);
 };
 
 extern const struct polynomial Polynomial;

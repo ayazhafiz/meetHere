@@ -1,26 +1,25 @@
 {
-  "name": "meethere",
-  "version": "0.2.5",
-  "description": "A hyper-efficient library for position manipulation",
+  "name": "position",
+  "version": "0.3.0",
+  "description": "A hyper-efficient library for coordinate manipulation",
   "main": "dist/index.js",
   "gypfile": true,
   "scripts": {
-    "beautify":
-      "./node_modules/.bin/prettier --write ./**/*.ts && clang-format -i ./src/native/**/*.{c,h} ./src/native/wrapper/*.{cpp,h}",
+    "beautify": "./node_modules/.bin/prettier --write ./**/*.ts && clang-format -i ./src/native/**/*.{c,h} ./src/native/wrapper/*.{cpp,h}",
     "build": "./node_modules/.bin/tsc",
     "compile": "rm -rf build && node-gyp configure && node-gyp rebuild",
-    "coverage":
-      "./node_modules/.bin/nyc report --reporter=lcov && open coverage/lcov-report/index.html",
-    "docs":
-      "npm run build && ./node_modules/.bin/jsdoc -c .jsdoc.json --verbose",
+    "coverage": "./node_modules/.bin/nyc report --reporter=lcov && open coverage/lcov-report/index.html",
+    "docs": "npm run build && ./node_modules/.bin/jsdoc -c .jsdoc.json --verbose",
     "ftest": "npm run compile && npm run tstest",
-    "posttest":
-      "./node_modules/.bin/nyc report --reporter=text-lcov | coveralls",
+    "posttest": "./node_modules/.bin/nyc report --reporter=text-lcov | coveralls",
     "test": "npm run tstest",
-    "tstest":
-      "./node_modules/.bin/nyc ./node_modules/.bin/mocha ./spec/*.spec.ts -t 5000"
+    "tstest": "./node_modules/.bin/nyc ./node_modules/.bin/mocha ./spec/*.spec.ts -t 5000"
   },
-  "pre-commit": ["beautify", "compile", "tstest"],
+  "pre-commit": [
+    "beautify",
+    "compile",
+    "tstest"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ayazhafiz/meetHere.git"
@@ -54,9 +53,16 @@
     "typescript": "^2.4.2"
   },
   "nyc": {
-    "extension": [".ts"],
-    "exclude": ["spec/**/*.ts", "src/index.ts"],
-    "require": ["ts-node/register"],
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "spec/**/*.ts",
+      "src/index.ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "cache": false
   }
 }

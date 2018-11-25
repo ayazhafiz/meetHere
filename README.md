@@ -1,29 +1,30 @@
-# meetHere <img src="https://cdn.rawgit.com/ayazhafiz/meetHere/master/meetHere.svg" height=220 align="right"/>
+# position :round_pushpin:
 > A blazing-fast JavaScript library for handling locations on and off maps.
 
-[![Build Status](https://travis-ci.org/ayazhafiz/meetHere.svg?branch=master)](https://travis-ci.org/ayazhafiz/meetHere)
-[![Coverage Status](https://coveralls.io/repos/github/ayazhafiz/meetHere/badge.svg?branch=master)](https://coveralls.io/github/ayazhafiz/meetHere?branch=master)
+[![Build Status](https://travis-ci.org/ayazhafiz/position.svg?branch=master)](https://travis-ci.org/ayazhafiz/position)
+[![Coverage Status](https://coveralls.io/repos/github/ayazhafiz/position/badge.svg?branch=master)](https://coveralls.io/github/ayazhafiz/position?branch=master)
 [![GitHub](https://img.shields.io/badge/View%20On-GitHub-blue.svg)](https://github.com/ayazhafiz/meetHere)
 
-meetHere is a library for quick, elegant manipulation of positional data on a 2D
-plane, and comes with first-class Google Maps support for on-the-fly
-determination of locations relevant to you and your users. Prominent features
-include:
-- [x] High-precision geometric center calculations
-- [x] Rapid path determination
-- [x] Determining relevant nearby locations
+`position` is a library for quick, elegant manipulation of positional data on a 2D
+plane. Prominent features include:
+- [x] High-precision geometric calculations
+- [x] Rapid path determinations
 - [x] Powerful async operations
 - [x] First-class TypeScript support
 - [x] C++ bindings
 - [ ] Time-minimum center (coming soon)
 
+> `position` was previously branded as `meetHere`, which had first-class support
+> for the Google Maps API. Due to decreased usage quotas of the Google Maps API,
+> this functionality has been removed.
+
 ## Installation
 ```bash
-$ yarn add meethere
+$ yarn add position.ts
 ```
 
 ```bash
-$ npm i meethere --save
+$ npm i position.ts --save
 ```
 
 Or [build it yourself](#develop)!
@@ -33,13 +34,11 @@ Or [build it yourself](#develop)!
 ## Usage
 You can find the full API [here](http://meethere.js.org).
 
-Currently, two classes are available:
-
 #### `Position` - a blazing-fast, 2D-locations manipulation prototype.
 > For general-purpose use, like in physics libraries or games.
 
 ```javascript
-import { Position } from 'meethere';
+import { Position } from 'position.ts';
 
 let Plane = new Position([[0, 1], [1.5, 3], [-9, 1.07]]);
 Plane.add([3, 4]);
@@ -48,32 +47,12 @@ Plane.median // => [ -1.125, 2.2675 ]
 Plane.score // => 0.11155562920022742
 ```
 
-#### `MeetHere` - a subclass of `Position` with first-class Google Maps support.
-> For user-interactive applications, like meetHere itself.
-
-To use non-super methods of `MeetHere`, you'll need a Google Maps API key, as
-described
-[here](https://github.com/googlemaps/google-maps-services-js#api-keys).
-
-```javascript
-import { MeetHere } from 'meethere';
-
-const MY_GOOGLE_MAPS_TOKEN = process.env.TOKEN;
-const user = [33.0952311, -96.8640427];
-const west = [33.0437115, -96.8157956];
-const senior = [33.0284505, -96.7546927];
-
-let Map = new MeetHere([user, west, senior], MY_GOOGLE_MAPS_TOKEN);
-Map.meetHere // => [ 33.04371181611578, -96.81579457575877 ]
-Map.nearby().then(console.log) // => { results: [...] }
-```
-
 ### Extensions
 
-Extending any class in meetHere for your specific use case is trivial:
+Extending any class in `position` for your specific use case is trivial:
 
 ```javascript
-import { Position, MeetHere } from 'meethere';
+import { Position } from 'position.ts';
 
 class Plane3D extends Position {
   constructor(args) {
@@ -88,23 +67,11 @@ class Plane3D extends Position {
     );
   }
 }
-
-class RideHere extends MeetHere {
-  constructor(args) {
-    super(...args);
-  }
-
-  get rides() {
-    return this.locations.map(
-      start => `${RIDE_API}?start=${start}&end=${this.center}&token=${RIDE_TKN}`
-    );
-  }
-}
 ```
 
 ## Develop
 ```bash
-git clone git@github.com:ayazhafiz/meetHere.git && cd meetHere
+git clone git@github.com:ayazhafiz/position.git && cd position
 yarn # or, npm install
 
 # develop some features
@@ -118,7 +85,7 @@ yarn test # or, npm test
 ```
 
 ## Support
-meetHere actively supports Node versions 4 and higher. More specifically:
+`position` actively supports Node versions 4 and higher. More specifically:
 - 4.x.x (LTS/argon)
 - 5.x.x
 - 6.x.x (LTS/boron)
@@ -128,7 +95,7 @@ meetHere actively supports Node versions 4 and higher. More specifically:
   * Note that failures in nightly versions are most likely a problem with Node,
   not with this package.
 
-meetHere may work with Node 0.x.x or io.js (1 - 3.x.x), but since these strains
+`position` may work with Node 0.x.x or io.js (1 - 3.x.x), but since these strains
 are not supported by Node anymore, this library does not target build
 compatibility with them. The sensitivity of this library's native bindings and
 ES targeting may make it completely inoperable with anything below LTS/argon.

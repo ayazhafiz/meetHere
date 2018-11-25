@@ -1,13 +1,15 @@
 #ifndef POINT_SET_H
 #define POINT_SET_H
 
+#include "toolkit/grid.h"
+
 #include <math.h>
 #include <stdbool.h>
-#include <stddef.h>
+#include <stdint.h>
 
-enum DIM
+enum DIM2
 {
-  DIM = 2
+  DIM2 = 2
 };
 
 /**
@@ -37,7 +39,7 @@ struct point_set
    *
    * @return  pointer to mean of points
    */
-  double * (*mean)(const double points[][DIM], size_t num_points);
+  Grid_2D (*mean)(const double points[][DIM2], uint64_t num_points);
 
   /**
    * @brief   Finds the geometric median of a set of 2D points.
@@ -58,9 +60,9 @@ struct point_set
    *
    * @return  pointer to geometric median of points
    */
-  double * (*geometric_median)(const double points[][DIM],
-                               size_t       num_points,
-                               const struct GeometricCenterOptions * options);
+  Grid_2D (*geometric_median)(const double points[][DIM2],
+                              uint64_t     num_points,
+                              const struct GeometricCenterOptions * options);
 };
 
 extern const struct point_set PointSet;

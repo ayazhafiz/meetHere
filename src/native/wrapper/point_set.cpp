@@ -28,17 +28,18 @@ void PointSetWrapper::mean(const v8::FunctionCallbackInfo<v8::Value> & args)
   }
 
   // get results
-  double *     center = PointSet.mean(points, length);
-  const double score  = IPS.net_distance(2,
-                                        center,
+  Grid_2D      center        = PointSet.mean(points, length);
+  double       center_arr[2] = {center.x, center.y};
+  const double score         = IPS.net_distance(2,
+                                        (const double *)center_arr,
                                         2,
                                         (const double **)points,
                                         length);
 
   // convert center back to JS Array
   v8::Local<v8::Array> _center = v8::Array::New(isolate);
-  _center->Set(0, v8::Number::New(isolate, center[0]));
-  _center->Set(1, v8::Number::New(isolate, center[1]));
+  _center->Set(0, v8::Number::New(isolate, center.x));
+  _center->Set(1, v8::Number::New(isolate, center.y));
 
   // create object to hold center and score
   v8::Local<v8::Object> result = v8::Object::New(isolate);
@@ -47,8 +48,6 @@ void PointSetWrapper::mean(const v8::FunctionCallbackInfo<v8::Value> & args)
               v8::Number::New(isolate, score));
 
   args.GetReturnValue().Set(result);
-
-  delete[] center;
 }
 
 /**
@@ -62,7 +61,7 @@ void PointSetWrapper::geometric(
 
   // get args
   v8::Local<v8::Array> _points   = v8::Local<v8::Array>::Cast(args[0]);
-  const size_t         numPoints = _points->Length();
+  const uint64_t       numPoints = _points->Length();
   const bool           subsearch = args[1]->BooleanValue();
   const double         epsilon   = args[2]->NumberValue();
   const double         bounds    = args[3]->NumberValue();
@@ -77,17 +76,18 @@ void PointSetWrapper::geometric(
   }
 
   // calculate geometric center
-  double *     center = PointSet.geometric_median(points, numPoints, &opts);
-  const double score  = IPS.net_distance(2,
-                                        center,
+  Grid_2D      center = PointSet.geometric_median(points, numPoints, &opts);
+  double       center_arr[2] = {center.x, center.y};
+  const double score         = IPS.net_distance(2,
+                                        (const double *)center_arr,
                                         2,
                                         (const double **)points,
                                         numPoints);
 
   // convert center back to JS Array
   v8::Local<v8::Array> _center = v8::Array::New(isolate);
-  _center->Set(0, v8::Number::New(isolate, center[0]));
-  _center->Set(1, v8::Number::New(isolate, center[1]));
+  _center->Set(0, v8::Number::New(isolate, center.x));
+  _center->Set(1, v8::Number::New(isolate, center.y));
 
   // create object to hold center and score
   v8::Local<v8::Object> result = v8::Object::New(isolate);
@@ -96,6 +96,4 @@ void PointSetWrapper::geometric(
               v8::Number::New(isolate, score));
 
   args.GetReturnValue().Set(result);
-
-  delete[] center;
 }

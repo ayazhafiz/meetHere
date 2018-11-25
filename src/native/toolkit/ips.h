@@ -1,7 +1,7 @@
 #ifndef TOOLKIT_IPS_H
 #define TOOLKIT_IPS_H
 
-#include <stddef.h>
+#include <stdint.h>
 
 struct inner_product_space
 {
@@ -14,7 +14,7 @@ struct inner_product_space
    *
    * @return  the norm of the vector
    */
-  double (*norm)(size_t degree, const double vec[], size_t dim);
+  double (*norm)(uint64_t degree, const double vec[], uint64_t dim);
 
   /**
    * @brief   Calculates the distance between two vectors using a norm.
@@ -26,10 +26,10 @@ struct inner_product_space
    *
    * @return  the distance between two vectors
    */
-  double (*norm_distance)(size_t       degree,
+  double (*norm_distance)(uint64_t     degree,
                           const double vec1[],
                           const double vec2[],
-                          size_t       dim);
+                          uint64_t     dim);
 
   /**
    * @brief   Calculates the net distance between a central point and a set of
@@ -45,11 +45,11 @@ struct inner_product_space
    *
    * @return  the net distance of vectors from the center to each neighbor
    */
-  double (*net_distance)(size_t         degree,
+  double (*net_distance)(uint64_t       degree,
                          const double   center[],
-                         size_t         dim,
+                         uint64_t       dim,
                          const double * neighbors[],
-                         size_t         num_neighbors);
+                         uint64_t       num_neighbors);
 };
 
 extern const struct inner_product_space IPS;

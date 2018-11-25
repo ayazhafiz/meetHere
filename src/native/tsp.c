@@ -7,10 +7,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-//
-// HELPERS
-//
-
 /**
  * @brief   Finds the nearest, unvisited point to a specified one.
  * @details Iterates over a cost matrix to find the point `k` nearest a
@@ -27,15 +23,15 @@
  * @return  index of nearest point, or -1 if there are no points left
  */
 static int __nearest_unvisited_point(const double * cost_matrix,
-                                     const size_t   o,
-                                     const size_t   num_points,
-                                     const size_t   visited_points[])
+                                     const uint64_t o,
+                                     const uint64_t num_points,
+                                     const uint64_t visited_points[])
 {
-  int    k        = -1;
-  size_t min_cost = SIZE_MAX;
+  int      k        = -1;
+  uint64_t min_cost = SIZE_MAX;
 
-  for (size_t cand = 0; cand < num_points; ++cand) {
-    const size_t _min_cost = cost_matrix[Array.idx_2d(o, cand, num_points)];
+  for (uint64_t cand = 0; cand < num_points; ++cand) {
+    const uint64_t _min_cost = cost_matrix[Array.idx_2d(o, cand, num_points)];
 
     if (visited_points[cand] == 0) {
       if (_min_cost < min_cost) {
@@ -47,10 +43,6 @@ static int __nearest_unvisited_point(const double * cost_matrix,
 
   return k;
 }
-
-//
-// MAIN
-//
 
 /**
  * @brief   Solves the travelling salesman problem for a set of points.
@@ -67,22 +59,22 @@ static int __nearest_unvisited_point(const double * cost_matrix,
  *
  * @return  a pointer to the indeces to travel, in order
  */
-static size_t * solve(const double * points,
-                      const size_t   num_points,
-                      const size_t   dimension,
-                      const size_t   start_index,
-                      const size_t   norm_degree)
+static uint64_t * solve(const double * points,
+                        const uint64_t num_points,
+                        const uint64_t dimension,
+                        const uint64_t start_index,
+                        const uint64_t norm_degree)
 {
-  double * cost_matrix    = Matrix.cost_matrix((const double **)points,
+  double *   cost_matrix    = Matrix.cost_matrix((const double **)points,
                                             num_points,
                                             dimension,
                                             norm_degree);
-  size_t * visited_points = Array.New.size_t_array(num_points);
-  size_t * travel_order   = Array.New.size_t_array(num_points);
-  travel_order[0]         = start_index;
+  uint64_t * visited_points = Array.New.uint64_t_array(num_points);
+  uint64_t * travel_order   = Array.New.uint64_t_array(num_points);
+  travel_order[0]           = start_index;
 
-  size_t current_point = start_index;
-  size_t idx           = 1;
+  uint64_t current_point = start_index;
+  uint64_t idx           = 1;
 
   while (idx < num_points) {
     visited_points[current_point] = 1;
@@ -91,8 +83,8 @@ static size_t * solve(const double * points,
                                                         num_points,
                                                         visited_points);
 
-    travel_order[idx] = (size_t)nearest_point;
-    current_point     = (size_t)nearest_point;
+    travel_order[idx] = (uint64_t)nearest_point;
+    current_point     = (uint64_t)nearest_point;
     ++idx;
   }
 
@@ -101,10 +93,6 @@ static size_t * solve(const double * points,
 
   return travel_order;
 }
-
-//
-// WRAPPERS
-//
 
 /**
  * @brief   Wraps solve for a better user API.
@@ -118,11 +106,11 @@ static size_t * solve(const double * points,
  *
  * @return  a pointer to the indeces to travel, in order
  */
-static size_t * __WRAPPER_solve(const double * points[],
-                                size_t         num_points,
-                                size_t         dimension,
-                                size_t         start_index,
-                                size_t         norm_degree)
+static uint64_t * __WRAPPER_solve(const double * points[],
+                                  uint64_t       num_points,
+                                  uint64_t       dimension,
+                                  uint64_t       start_index,
+                                  uint64_t       norm_degree)
 {
   return solve((const double *)points,
                num_points,

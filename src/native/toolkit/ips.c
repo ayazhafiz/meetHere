@@ -4,14 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//
-// HELPERS
-//
-
-//
-// MAIN
-//
-
 /**
  * @brief  Calculates the norm of a vector.
  *
@@ -21,10 +13,12 @@
  *
  * @return the norm of the vector
  */
-static double norm(const size_t degree, const double vec[], const size_t dim)
+static double norm(const uint64_t degree,
+                   const double   vec[],
+                   const uint64_t dim)
 {
   double sum = 0;
-  for (size_t i = 0; i < dim; ++i) {
+  for (uint64_t i = 0; i < dim; ++i) {
     sum += pow(fabs(vec[i]), degree);
   }
   return pow(sum, (1.0 / degree));
@@ -40,13 +34,13 @@ static double norm(const size_t degree, const double vec[], const size_t dim)
  *
  * @return  the distance between two vectors
  */
-static double norm_distance(const size_t degree,
-                            const double vec1[],
-                            const double vec2[],
-                            const size_t dim)
+static double norm_distance(const uint64_t degree,
+                            const double   vec1[],
+                            const double   vec2[],
+                            const uint64_t dim)
 {
   double sum = 0;
-  for (size_t i = 0; i < dim; ++i) {
+  for (uint64_t i = 0; i < dim; ++i) {
     sum += pow(fabs(vec1[i] - vec2[i]), degree);
   }
   return pow(sum, (1.0 / degree));
@@ -66,22 +60,18 @@ static double norm_distance(const size_t degree,
  *
  * @return  the net distance of vectors from the center to each neighbor
  */
-static double net_distance(const size_t degree,
-                           const double center[],
-                           const size_t dim,
-                           const double neighbors[],
-                           const size_t num_neighbors)
+static double net_distance(const uint64_t degree,
+                           const double   center[],
+                           const uint64_t dim,
+                           const double   neighbors[],
+                           const uint64_t num_neighbors)
 {
   double sum = 0;
-  for (size_t i = 0; i < num_neighbors; ++i) {
+  for (uint64_t i = 0; i < num_neighbors; ++i) {
     sum += IPS.norm_distance(degree, center, (neighbors + i * dim), dim);
   }
   return sum;
 }
-
-//
-// WRAPPERS
-//
 
 /**
  * @brief   Wraps net_distance for a better user API.
@@ -94,11 +84,11 @@ static double net_distance(const size_t degree,
  *
  * @return  the net norm of vectors from the center to each neighbor
  */
-static double __WRAP_net_distance(const size_t   degree,
+static double __WRAP_net_distance(const uint64_t degree,
                                   const double   center[],
-                                  const size_t   dim,
+                                  const uint64_t dim,
                                   const double * neighbors[],
-                                  const size_t   num_neighbors)
+                                  const uint64_t num_neighbors)
 {
   return net_distance(degree,
                       center,

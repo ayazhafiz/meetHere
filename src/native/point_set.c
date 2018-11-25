@@ -5,10 +5,6 @@
 
 #include <stdlib.h>
 
-//
-// HELPERS
-//
-
 enum NUM_DIRS
 {
   NUM_DIRS = 8
@@ -23,12 +19,11 @@ enum NUM_DIRS
  */
 #define SQRT2 1.41421356237309504880
 #define S2 SQRT2 / 2
-static const double DELTA[][NUM_DIRS] = {{-1, -S2, 0, S2, 1, S2, 0, -S2},
-                                         {0, S2, 1, S2, 0, -S2, -1, -S2}};
-
-//
-// MAIN
-//
+static const struct
+{
+  double x[NUM_DIRS];
+  double y[NUM_DIRS];
+} DELTA = {{-1, -S2, 0, S2, 1, S2, 0, -S2}, {0, S2, 1, S2, 0, -S2, -1, -S2}};
 
 /**
  * @brief   Finds the mean of a set of 2D points.
@@ -40,22 +35,18 @@ static const double DELTA[][NUM_DIRS] = {{-1, -S2, 0, S2, 1, S2, 0, -S2},
  *
  * @return  pointer to mean of points
  */
-static double * mean(const double points[][DIM], const size_t num_points)
+static Grid_2D mean(const double points[][DIM2], const uint64_t num_points)
 {
-  double center[DIM] = {0};
-
-  for (size_t i = 0; i < num_points; ++i) {
-    for (size_t dim = 0; dim < DIM; ++dim) {
-      center[dim] += points[i][dim];
-    }
+  Grid_2D center = {0, 0};
+  for (uint64_t i = 0; i < num_points; ++i) {
+    center.x += points[i][0];
+    center.y += points[i][1];
   }
 
-  double * res = Array.New.double_array(DIM);
-  for (size_t i = 0; i < DIM; ++i) {
-    res[i] = center[i] / num_points;
-  }
+  center.x = center.x / num_points;
+  center.y = center.y / num_points;
 
-  return res;
+  return center;
 }
 
 /**
@@ -77,20 +68,19 @@ static double * mean(const double points[][DIM], const size_t num_points)
  *
  * @return  pointer to geometric median of points
  */
-static double * geometric_median(const double points[][DIM],
-                                 const size_t num_points,
-                                 const struct GeometricCenterOptions * options)
+static Grid_2D geometric_median(const double   points[][DIM2],
+                                const uint64_t num_points,
+                                const struct GeometricCenterOptions * options)
 {
   // fill center to CoM, calculate initial score and step
-  double * center = PointSet.mean(points, num_points);
-  double   score  = IPS.net_distance(DIM,
-                                  center,
-                                  DIM,
+  Grid_2D center             = PointSet.mean(points, num_points);
+  double  __center_arr[DIM2] = {center.x, center.y};
+  double  score              = IPS.net_distance(DIM2,
+                                  (const double *)__center_arr,
+                                  DIM2,
                                   (const double **)points,
                                   num_points);
-  double   step   = score / num_points * options->bounds;
-
-  double * _center = Array.New.double_array(DIM);
+  double  step               = score / num_points * options->bounds;
 
   // descend gradient, searching for the function minimum, until the error
   // reaches some acceptable epsilon.
@@ -98,21 +88,19 @@ static double * geometric_median(const double points[][DIM],
     bool improved = false;
 
     // check points a step in each direction to find the lowest cost
-    for (size_t i = 0; i < NUM_DIRS; options->subsearch ? ++i : (i += 2)) {
-      for (size_t dim = 0; dim < DIM; ++dim) {
-        _center[dim] = center[dim] + step * DELTA[dim][i];
-      }
+    for (uint64_t i = 0; i < NUM_DIRS; options->subsearch ? ++i : (i += 2)) {
+      __center_arr[0] = center.x + step * DELTA.x[i];
+      __center_arr[1] = center.y + step * DELTA.y[i];
 
-      const double _score = IPS.net_distance(DIM,
-                                             _center,
-                                             DIM,
+      const double _score = IPS.net_distance(DIM2,
+                                             (const double *)__center_arr,
+                                             DIM2,
                                              (const double **)points,
                                              num_points);
 
       if (_score < score) {
-        for (size_t dim = 0; dim < DIM; ++dim) {
-          center[dim] = _center[dim];
-        }
+        center.x = __center_arr[0];
+        center.y = __center_arr[1];
         score    = _score;
         improved = true;
         break;
@@ -124,14 +112,8 @@ static double * geometric_median(const double points[][DIM],
     }
   }
 
-  free(_center);
-
   return center;
 }
-
-//
-// WRAPPERS
-//
 
 const struct point_set PointSet = {.mean             = mean,
                                    .geometric_median = geometric_median};

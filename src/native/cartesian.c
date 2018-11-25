@@ -4,17 +4,9 @@
 
 #include <math.h>
 
-//
-// HELPERS
-//
-
 static const float EARTH_RADIUS_METERS = 6371e3;
 static const float METER_TO_KM         = 1e-3;
 static const float METER_TO_MI         = 6.2137119223733e-4;
-
-//
-// MAIN
-//
 
 /**
  * @brief   Calculates the earthly distance between two cartesian points.
@@ -55,9 +47,5 @@ static double haversine_distance(const double start_latitude,
 
   return d * (unit == 'm' ? METER_TO_KM : METER_TO_MI);
 }
-
-//
-// WRAPPERS
-//
 
 const struct cartesian Cartesian = {.haversine_distance = haversine_distance};
