@@ -31,11 +31,11 @@ void CartesianWrapper::distance(
   v8::Local<v8::Array> _center = v8::Local<v8::Array>::Cast(args[1]);
   const char           unit    = (char)(args[2]->Uint32Value());
 
-  const size_t length = _points->Length();
+  const uint64_t length = _points->Length();
 
   // pass locations to C++ array
   double points[length][2];
-  for (size_t i = 0; i < length; ++i) {
+  for (uint64_t i = 0; i < length; ++i) {
     v8::Local<v8::Array> _element = v8::Local<v8::Array>::Cast(_points->Get(i));
     points[i][0]                  = _element->Get(0)->NumberValue();
     points[i][1]                  = _element->Get(1)->NumberValue();
@@ -49,7 +49,7 @@ void CartesianWrapper::distance(
 
   // record distances from each location to center
   v8::Local<v8::Array> distances = v8::Array::New(isolate);
-  for (size_t i = 0; i < length; ++i) {
+  for (uint64_t i = 0; i < length; ++i) {
     // start lat, lng
     const double sLat = degtorad(center[0]);
     const double sLng = degtorad(center[1]);

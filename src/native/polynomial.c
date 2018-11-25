@@ -6,10 +6,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-//
-// HELPERS
-//
-
 #ifndef __D_swap
 #define __D_swap(a, b, type) \
   {                          \
@@ -19,7 +15,7 @@
   }
 #endif
 
-static const size_t DEFAULT_DEGREE = 2;
+static const uint64_t DEFAULT_DEGREE = 2;
 
 /**
  * @brief   Generates an augmented Vandermonde matrix for a polynomial of
@@ -44,18 +40,18 @@ static const size_t DEFAULT_DEGREE = 2;
  */
 static double * __augmented_vandermonde(const double * V_uniq,
                                         const double * p,
-                                        const size_t   k)
+                                        const uint64_t   k)
 {
-  const size_t rows = k + 1;
-  const size_t cols = k + 2;
+  const uint64_t rows = k + 1;
+  const uint64_t cols = k + 2;
   double *     A    = Array.New.double_array(rows * cols);
 
-  for (size_t r = 0; r < (k + 1); ++r) {
-    for (size_t c = 0; c < (k + 1); ++c) {
+  for (uint64_t r = 0; r < (k + 1); ++r) {
+    for (uint64_t c = 0; c < (k + 1); ++c) {
       A[r * cols + c] = V_uniq[r + c];  // store values of Vandermonde matrix
     }
 
-    size_t last_in_row = r * cols + k + 1;  // [r][cols-1]; i.e. [r][k + 1]
+    uint64_t last_in_row = r * cols + k + 1;  // [r][cols-1]; i.e. [r][k + 1]
     A[last_in_row]     = p[r];              // store projected vector
   }
 
@@ -78,14 +74,14 @@ static double * __augmented_vandermonde(const double * V_uniq,
  *          polynomial's Vandermonde matrix.
  */
 static double * __vandermonde(const double x_points[],
-                              const size_t num_points,
-                              const size_t k)
+                              const uint64_t num_points,
+                              const uint64_t k)
 {
-  const size_t len    = 2 * k + 1;
+  const uint64_t len    = 2 * k + 1;
   double *     vmonde = Array.New.double_array(len);
 
-  for (size_t deg = 0; deg < len; ++deg) {
-    for (size_t i = 0; i < num_points; ++i) {  // Σ^n(x_i^(`deg`))
+  for (uint64_t deg = 0; deg < len; ++deg) {
+    for (uint64_t i = 0; i < num_points; ++i) {  // Σ^n(x_i^(`deg`))
       vmonde[deg] += pow(x_points[i], deg);
     }
   }
@@ -112,23 +108,19 @@ static double * __vandermonde(const double x_points[],
  */
 static double * __projected_vector(const double x_points[],
                                    const double y_points[],
-                                   const size_t num_points,
-                                   const size_t k)
+                                   const uint64_t num_points,
+                                   const uint64_t k)
 {
-  const size_t len = k + 1;
+  const uint64_t len = k + 1;
   double *     vec = Array.New.double_array(len);
 
-  for (size_t deg = 0; deg < len; ++deg) {
-    for (size_t i = 0; i < num_points; ++i) {  // Σ^n(x_i^(`deg`) * y_i)
+  for (uint64_t deg = 0; deg < len; ++deg) {
+    for (uint64_t i = 0; i < num_points; ++i) {  // Σ^n(x_i^(`deg`) * y_i)
       vec[deg] += pow(x_points[i], deg) * y_points[i];
     }
   }
   return vec;
 }
-
-//
-// MAIN
-//
 
 /**
  * @brief   Guesses the optimal degree of a polynomial function best fitting a
@@ -142,9 +134,9 @@ static double * __projected_vector(const double x_points[],
  *
  * @return  best degree of polynomial to approximate
  */
-static size_t guess_degree(const double x[],
+static uint64_t guess_degree(const double x[],
                            const double y[],
-                           const size_t num_points)
+                           const uint64_t num_points)
 {
   if (num_points <= 1) {  // 0-degree function
     return 0;
@@ -152,17 +144,17 @@ static size_t guess_degree(const double x[],
 
   // copy, then sort y coordinates
   double * sorted_y = Array.New.double_array(num_points);
-  for (size_t i = 0; i < num_points; ++i) {
+  for (uint64_t i = 0; i < num_points; ++i) {
     sorted_y[i] = y[i];
   }
   {  // bubble sort
     int    sorted = 0;
-    size_t pass   = 0;
+    uint64_t pass   = 0;
 
     while (sorted != 1) {
       sorted = 1;
       ++pass;
-      for (size_t i = 0; i < num_points - pass; ++i) {
+      for (uint64_t i = 0; i < num_points - pass; ++i) {
         if (x[i] > x[i + 1]) {
           __D_swap(sorted_y[i], sorted_y[i + 1], double);
           sorted = 0;
@@ -173,8 +165,8 @@ static size_t guess_degree(const double x[],
 
   // count extrema
   int    dir     = sorted_y[0] < sorted_y[1] ? 1 : -1;
-  size_t extrema = 0;
-  for (size_t i = 1; i < num_points - 1; ++i) {
+  uint64_t extrema = 0;
+  for (uint64_t i = 1; i < num_points - 1; ++i) {
     const int _dir = sorted_y[i] < sorted_y[i + 1] ? 1 : -1;
     if (dir != _dir) {  // change of slope sign
       ++extrema;
@@ -222,10 +214,10 @@ static size_t guess_degree(const double x[],
  */
 static double * best_fit(const double x_points[],
                          const double y_points[],
-                         const size_t num_points,
-                         const size_t polynomial_degree)
+                         const uint64_t num_points,
+                         const uint64_t polynomial_degree)
 {
-  const size_t dimension = polynomial_degree + 1;
+  const uint64_t dimension = polynomial_degree + 1;
 
   double * M           = __vandermonde(x_points, num_points, polynomial_degree);
   double * b           = __projected_vector(x_points,
@@ -245,10 +237,6 @@ static double * best_fit(const double x_points[],
 
   return x;
 }
-
-//
-// WRAPPERS
-//
 
 const struct polynomial Polynomial = {.guess_degree = guess_degree,
                                       .best_fit     = best_fit};

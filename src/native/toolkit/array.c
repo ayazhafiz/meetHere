@@ -3,14 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//
-// HELPERS
-//
-
-//
-// MAIN
-//
-
 /**
  * @brief   Creates a dynamic array of doubles initialized to zero.
  *
@@ -18,7 +10,7 @@
  *
  * @return  pointer to the array
  */
-static inline double * double_array(const size_t len)
+static inline double * double_array(const uint64_t len)
 {
   double * res = (double *)malloc(len * sizeof(double));
   memset(res, 0, len * sizeof(double));
@@ -26,16 +18,16 @@ static inline double * double_array(const size_t len)
 }
 
 /**
- * @brief   Creates a dynamic array of size_t initialized to zero.
+ * @brief   Creates a dynamic array of uint64_t initialized to zero.
  *
  * @param   len               length of the array
  *
  * @return  pointer to the array
  */
-static inline size_t * size_t_array(const size_t len)
+static inline uint64_t * uint64_t_array(const uint64_t len)
 {
-  size_t * res = (size_t *)malloc(len * sizeof(size_t));
-  memset(res, 0, len * sizeof(size_t));
+  uint64_t * res = (uint64_t *)malloc(len * sizeof(uint64_t));
+  memset(res, 0, len * sizeof(uint64_t));
   return res;
 }
 
@@ -49,17 +41,13 @@ static inline size_t * size_t_array(const size_t len)
  *
  * @return  the corresponding index in the flattened array
  */
-static inline size_t idx_2d(const size_t row,
-                            const size_t col,
-                            const size_t num_cols)
+static inline uint64_t idx_2d(const uint64_t row,
+                              const uint64_t col,
+                              const uint64_t num_cols)
 {
   return row * num_cols + col;
 }
 
-//
-// WRAPPERS
-//
-
-const struct array Array = {.New    = {.double_array = double_array,
-                                    .size_t_array = size_t_array},
+const struct array Array = {.New    = {.double_array   = double_array,
+                                    .uint64_t_array = uint64_t_array},
                             .idx_2d = idx_2d};

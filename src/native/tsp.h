@@ -1,15 +1,15 @@
 #ifndef TSP_H
 #define TSP_H
 
-#include <stddef.h>
+#include <stdint.h>
 
 struct travelling_salesman_problem
 {
-  size_t * (*solve)(const double * points[],
-                    size_t         num_points,
-                    size_t         dimension,
-                    size_t         start_index,
-                    size_t         norm_degree);
+  uint64_t * (*solve)(const double * points[],
+                      uint64_t       num_points,
+                      uint64_t       dimension,
+                      uint64_t       start_index,
+                      uint64_t       norm_degree);
 };
 
 extern const struct travelling_salesman_problem TSP;

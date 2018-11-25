@@ -1,7 +1,7 @@
 #ifndef TOOLKIT_ARRAY_H
 #define TOOLKIT_ARRAY_H
 
-#include <stddef.h>
+#include <stdint.h>
 
 struct new_
 {
@@ -12,16 +12,16 @@ struct new_
    *
    * @return  pointer to the array
    */
-  double * (*double_array)(size_t len);
+  double * (*double_array)(uint64_t len);
 
   /**
-   * @brief   Creates a dynamic array of size_t initialized to zero.
+   * @brief   Creates a dynamic array of uint64_t initialized to zero.
    *
    * @param   len               length of the array
    *
    * @return  pointer to the array
    */
-  size_t * (*size_t_array)(size_t len);
+  uint64_t * (*uint64_t_array)(uint64_t len);
 };
 
 struct array
@@ -38,7 +38,7 @@ struct array
    *
    * @return  the corresponding index in the flattened array
    */
-  size_t (*idx_2d)(size_t row, size_t col, size_t num_cols);
+  uint64_t (*idx_2d)(uint64_t row, uint64_t col, uint64_t num_cols);
 };
 
 extern const struct array Array;

@@ -1,7 +1,7 @@
 #ifndef TOOLKIT_MATRIX_H
 #define TOOLKIT_MATRIX_H
 
-#include <stddef.h>
+#include <stdint.h>
 
 struct matrix
 {
@@ -22,7 +22,7 @@ struct matrix
    * @param   dimension        the dimension of the submatrix and vector
    *                           comprising the augmented matrix
    */
-  void (*eliminate_gaussian)(double * matrix[], size_t dimension);
+  void (*eliminate_gaussian)(double * matrix[], uint64_t dimension);
 
   /**
    * @brief   Solves a augmented matrix in reduced echelon form.
@@ -38,7 +38,7 @@ struct matrix
    * @return  a pointer to the values of the solution vector
    */
   double * (*solve_reduced_augmented)(const double * matrix[],
-                                      size_t         dimension);
+                                      uint64_t       dimension);
 
   /**
    * @brief   Creates a cost matrix based on distances among a set of vectors.
@@ -55,9 +55,9 @@ struct matrix
    * @return  a pointer to the cost matrix
    */
   double * (*cost_matrix)(const double * vectors[],
-                          size_t         num_vectors,
-                          size_t         dimension,
-                          size_t         norm_degree);
+                          uint64_t       num_vectors,
+                          uint64_t       dimension,
+                          uint64_t       norm_degree);
 };
 
 extern const struct matrix Matrix;

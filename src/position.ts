@@ -196,6 +196,7 @@ class Position {
    * ```
    * let plane = new Position([[0, 0], [5, 10], [3, 4]]);
    * plane.quickPath; // => [0, 2, 1]
+   * ```
    */
   get quickPath() {
     return CLIB.tsp(
