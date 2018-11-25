@@ -32,7 +32,7 @@ Or [build it yourself](#develop)!
 <sub>[Supported Node versions](#support)</sub>
 
 ## Usage
-You can find the full API [here](http://meethere.js.org).
+You can find the full API [here](https://ayazhafiz.github.io/position/).
 
 #### `Position` - a blazing-fast, 2D-locations manipulation prototype.
 > For general-purpose use, like in physics libraries or games.
