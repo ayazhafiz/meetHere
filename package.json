@@ -1,5 +1,5 @@
 {
-  "name": "position",
+  "name": "position.ts",
   "version": "0.3.0",
   "description": "A hyper-efficient library for coordinate manipulation",
   "main": "dist/index.js",
