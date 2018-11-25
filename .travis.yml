@@ -13,7 +13,7 @@ script:
   - yarn test
 after_success:
   - yarn docs
-  - mv docs/position/* out
+  - mv docs/position.ts/* out
 deploy:
   provider: pages
   local_dir: out
