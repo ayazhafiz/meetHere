@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>position.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Position.html">Position</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#add">add</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#bestPath">bestPath</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#center">center</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#centerCost">centerCost</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#geometricSignificance">geometricSignificance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#mean">mean</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#meanCost">meanCost</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#move">move</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#polynomial">polynomial</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#quickPath">quickPath</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Position.html#remove">remove</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">position.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+var __assign = (this &amp;&amp; this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i &lt; n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var array_1 = require("./util/array");
+var Bindings = require("bindings");
+var CLIB = Bindings('api');
+exports.CLIB = CLIB;
+var Method = {
+    tsp: 't'.charCodeAt(0),
+    naiveVrp: 'n'.charCodeAt(0),
+};
+array_1.arrayUtil();
+/**
+ * A prototype describing a set of points on a plane.
+ *
+ * ```
+ * import { Position } from 'meethere';
+ *
+ * const options = {
+ *   subsearch: true,
+ *   epsilon: 1e-4,
+ *   bounds: 15
+ * }
+ *
+ * let Plane = new Position(
+ *   [ [5, 6.1], [-2.07, -1.33], [9.8, -0.02] ],
+ *   options
+ * );
+ * Plane.add([1, -4]);
+ * Plane.center // => [ 2.2460648128951566, -0.853617418121833 ]
+ * Plane.score // => 0.010113270070291593
+ * ```
+ *
+ * @class
+ */
+var Position = /** @class */ (function () {
+    /**
+     * Creates a Position on a plane described by a set of locations.
+     *
+     * @constructs
+     * @param {Array} locations 2D Array of points on a plane
+     * @param {CenterOptions} [options=Position.defaultCenterOptions] General
+     * search options
+     */
+    function Position(locations, options) {
+        if (options === void 0) { options = {}; }
+        this.locations = locations;
+        this.options = __assign({}, Position.defaultCenterOptions, options);
+    }
+    /**
+     * Adds a location to the set of points.
+     *
+     * @name Position#add
+     * @function
+     * @param {Array} location Point to add
+     *
+     * ```
+     * let plane = new Position([[0, 1]]);
+     * plane.add([1, 0]); // => [[0, 1], [1, 0]]
+     * ```
+     */
+    Position.prototype.add = function (location) {
+        this.locations.push(location);
+    };
+    /**
+     * Removes a location to the set of points.
+     *
+     * @name Position#remove
+     * @function
+     * @param {Array} location Point to remove
+     * @return {Array|number} The removed location, or `-1` if no match is found
+     *
+     * ```
+     * let plane = new Position([[2, 3], [5, 6]]);
+     * plane.remove([2, 3]); // => [[5, 6]]
+     * ```
+     */
+    Position.prototype.remove = function (location) {
+        var idx = this.locations.deepIndexOf(location);
+        if (idx > -1) {
+            return this.locations.splice(idx, 1)[0];
+        }
+        return idx;
+    };
+    /**
+     * Moves (replaces) an existing location.
+     *
+     * @name Position#move
+     * @function
+     * @param {Array} location Point to move
+     * @param {Array} to Value to move to
+     * @return {Array|number} The previous location, or `-1` if no match is found
+     *
+     * ```
+     * let plane = new Position([[0, 1]]);
+     * plane.move([0, 1], [9, 10]); // => [[9, 10]]
+     * ```
+     */
+    Position.prototype.move = function (location, to) {
+        var idx = this.locations.deepIndexOf(location);
+        if (idx > -1) {
+            return this.locations.splice(idx, 1, to)[0];
+        }
+        return idx;
+    };
+    Object.defineProperty(Position.prototype, "center", {
+        /**
+         * Calculates the geometric center of the Position.
+         *
+         * @name Position#center
+         * @see https://stackoverflow.com/a/12934484
+         * @desc heavily optimized, natively binded version of @see
+         * @function
+         * @return {Array} Geometric center of the Position
+         *
+         * ```
+         * let plane = new Position([[0, 0], [0, 1], [1, 0]]);
+         * plane.center; // => [0.21198, 0.21198]
+         * ```
+         */
+        get: function () {
+            return CLIB.geometric(this.locations, this.options.subsearch, this.options.epsilon, this.options.bounds).center;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "mean", {
+        /**
+         * Calculates the mean of the Position.
+         *
+         * @name Position#mean
+         * @desc a rudimentary estimate for Position#center
+         * @function
+         * @return {Array} Geometric center of the Position
+         *
+         * ```
+         * let plane = new Position([[0, 0], [0, 1], [1, 0]]);
+         * plane.center; // => [0.33333, 0.33333]
+         * ```
+         */
+        get: function () {
+            return CLIB.mean(this.locations).center;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "bestPath", {
+        /**
+         * Returns the index order of the least-costly path between all locations on
+         * the plane through a solution of the TSP (~80 point efficiency).
+         *
+         * @name Position#bestPath
+         * @TODO More involved TSP solution (figure out or-tools bindings)
+         * @function
+         * @return {Array} Order of indeces of the locations on the plane that gives
+         * the shortest path
+         *
+         * ```
+         * let plane = new Position([[0, 0], [5, 10], [3, 4]]);
+         * plane.bestPath; // => [0, 2, 1]
+         * ```
+         */
+        get: function () {
+            return CLIB.tsp(this.locations, this.options.startIndex, Method['tsp']);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "quickPath", {
+        /**
+         * Returns the index order of the least-costly manhattan-style drive between
+         * all locations on the plane through a solution of the VRP (~80 point
+         * efficiency).
+         *
+         * @name Position#quickPath
+         * @TODO More involved VRP solution (figure out or-tools bindings)
+         * @function
+         * @return {Array} Order of indeces of the locations on the plane that gives
+         * the shortest manhattan path
+         *
+         * ```
+         * let plane = new Position([[0, 0], [5, 10], [3, 4]]);
+         * plane.quickPath; // => [0, 2, 1]
+         * ```
+         */
+        get: function () {
+            return CLIB.tsp(this.locations, this.options.startIndex, Method['naiveVrp']);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "polynomial", {
+        /**
+         * Returns the coefficients of a n-degree polynomial best-fit to the locations
+         * on the plane. Degree is specified during class instantiation, and is auto-
+         * calculated by default.
+         *
+         * @name Position#polynomial
+         * @function
+         * @return {Array} an n-length array of the coefficients of a best-fit,
+         * n-degree polynomial, where each index corresponds to its degree.
+         *
+         * ```
+         * let plane = new Position([[0, 1], [1, 7], [2, 21]]);
+         * plane.polynomial; // => [1, 4, 9] { 1(x^0) + 4(x^1) + 9(x^2) }
+         * ```
+         */
+        get: function () {
+            return CLIB.bestFit(this.locations, this.options.degree);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "meanCost", {
+        /**
+         * Calculates the net cost of travelling from the points to their mean.
+         *
+         * @name Position#meanCost
+         * @function
+         * @return {number} Cost of travelling
+         *
+         * ```
+         * let plane = new Position([[0, 1], [1, 14], [2, 45]]);
+         * plane.meanCost; // => 50.04629
+         * ```
+         */
+        get: function () {
+            return CLIB.mean(this.locations).score;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "centerCost", {
+        /**
+         * Calculates the net cost of travelling from the points to their geometric
+         * center.
+         *
+         * @name Position#centerCost
+         * @function
+         * @return {number} Cost of travelling
+         *
+         * ```
+         * let plane = new Position([[0, 1], [1, 14], [2, 45]]);
+         * plane.centerCost; // => 44.05482
+         * ```
+         */
+        get: function () {
+            return CLIB.geometric(this.locations, this.options.subsearch, this.options.epsilon, this.options.bounds).score;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Position.prototype, "geometricSignificance", {
+        /**
+         * Calculates the percent improvement of Position#center as compared to
+         * Position#mean in each dimension.
+         *
+         * @name Position#geometricSignificance
+         * @function
+         * @return {Array} Median of the Position
+         *
+         * ```
+         * let plane = new Position([[0, 1], [1, 14], [2, 45]]);
+         * plane.geometricSignificance; // => 0.11971858482905647
+         * ```
+         */
+        get: function () {
+            var _a = [this.meanCost, this.centerCost], mean = _a[0], center = _a[1];
+            return (mean - center) / mean;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * Default geometric center options
+     *
+     * @constant
+     * @type {CenterOptions}
+     * @default
+     */
+    Position.defaultCenterOptions = {
+        subsearch: false,
+        epsilon: 1e-3,
+        bounds: 10,
+        startIndex: 0,
+        degree: null,
+    };
+    return Position;
+}());
+exports.Position = Position;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Nov 25 2018 02:14:11 GMT+0000 (UTC) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
