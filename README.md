@@ -1,4 +1,4 @@
-# position :round_pushpin:
+# position 📍
 > A blazing-fast JavaScript library for handling locations on and off maps.
 
 [![Build Status](https://travis-ci.org/ayazhafiz/position.svg?branch=master)](https://travis-ci.org/ayazhafiz/position)
