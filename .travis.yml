@@ -13,12 +13,11 @@ script:
   - yarn test
 after_success:
   - yarn docs
-  - mv docs/meethere/* out
+  - mv docs/position/* out
 deploy:
   provider: pages
   local_dir: out
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  fqdn: meethere.js.org
   on:
     branch: master
