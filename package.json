@@ -30,9 +30,7 @@
     "url": "https://github.com/ayazhafiz/meetHere/issues"
   },
   "homepage": "https://github.com/ayazhafiz/meetHere#readme",
-  "dependencies": {
-    "@google/maps": "^0.4.3"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/chai-as-promised": "^0.0.31",
