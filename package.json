@@ -30,9 +30,7 @@
     "url": "https://github.com/ayazhafiz/meetHere/issues"
   },
   "homepage": "https://github.com/ayazhafiz/meetHere#readme",
-  "dependencies": {
-    "@google/maps": "^0.4.3"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/chai-as-promised": "^0.0.31",
@@ -40,12 +38,12 @@
     "@types/node": "^8.0.17",
     "benchmark": "^2.1.4",
     "bindings": "^1.3.0",
-    "chai": "^4.1.0",
+    "chai": "^4.2",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^2.13.1",
     "jsdoc": "^3.5.5",
     "minami": "^1.2.3",
-    "mocha": "^3.4.2",
+    "mocha": "^6",
     "nyc": "^11.0.3",
     "pre-commit": "^1.2.2",
     "prettier": "1.12.1",
